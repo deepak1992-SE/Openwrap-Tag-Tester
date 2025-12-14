@@ -18,9 +18,11 @@ console.log('Server started');
 console.log('__dirname:', __dirname);
 console.log('CLIENT_BUILD_PATH:', CLIENT_BUILD_PATH);
 try {
+    const clientPath = path.join(__dirname, '../client');
+    console.log('Listing CLIENT_PATH contents:', fs.readdirSync(clientPath));
     console.log('Listing CLIENT_BUILD_PATH contents:', fs.readdirSync(CLIENT_BUILD_PATH));
 } catch (e) {
-    console.error('Failed to list CLIENT_BUILD_PATH:', e.message);
+    console.error('Debug: Failed to list paths:', e.message);
 }
 
 // Serve static files from the client app
