@@ -1,0 +1,19 @@
+{
+  "name": "ow-tag-tester",
+  "version": "1.0.0",
+  "description": "A web application to validate ad tags against defined rules.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "cd server && node index.js",
+    "client": "cd client && npm run dev",
+    "build": "npm install && cd server && npm install && cd ../client && npm install && npm run build",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

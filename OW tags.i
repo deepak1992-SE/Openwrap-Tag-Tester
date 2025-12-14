@@ -1,0 +1,9 @@
+OW Working - 
+
+https://ow.pubmatic.com/video/vast?site.pub.id=166037&site.domain=tubitv.com&req.ext.wrapper.profileid=15845&imp.tagid=tubitv.com_Desktop_video&imp.secure=1&imp.vid.ext.adpod.adminduration=15&imp.vid.ext.adpod.admaxduration=60&imp.vid.ext.adpod.minads=1&imp.vid.ext.adpod.maxads=5&imp.vid.w=1920&imp.vid.h=1080&imp.vid.minduration=15&imp.vid.maxduration=150&imp.vid.mimes=video%2Fmp4&imp.vid.linearity=1&imp.vid.protocols=2%2C3%2C5%2C6%2C7%2C8&dev.devicetype=2&dev.dnt=0&site.page=https%3A%2F%2Ftubitv.com
+
+OW Not Working -
+https://ow.pubmatic.com/video/vast?site.pub.id=166037&site.domain=tubitv.com&req.ext.wrapper.profileid=15845&imp.tagid=tubitv.com_Desktop_video&imp.secure=1&imp.vid.ext.adpod.adminduration=15&imp.vid.ext.adpod.admaxduration=60&imp.vid.ext.adpod.minads=1&imp.vid.ext.adpod.maxads=5&imp.vid.w=1920&imp.vid.h=1080&imp.vid.minduration=15&imp.vid.maxduration=150&imp.vid.mimes=video%2Fmp4&imp.vid.linearity=1&imp.vid.protocols=2%2C3%2C5%2C6%2C7%2C8&dev.devicetype=2&dev.dnt=0
+
+APP Working - 
+https://ow.pubmatic.com/video/vast?imp.vid.maxbitrate=8000&imp.vid.boxingallowed=1&imp.secure=1&req.ext.wrapper.clientconfig=1&req.at=1&app.name=JioCinema%20-%20Shows%2C%20TV%2C%20Sports&imp.tagid=Jio_Sports_CTV_Android_TV&req.cur=USD&app.storeurl=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.jio.media.ondemand&app.pub.id=163612&app.bundle=com.jio.media.ondemand&imp.vid.placement=1&imp.vid.mimes=video%2Fmp4&imp.vid.protocols=2%2C3%2C5%2C6%2C7%2C8&imp.vid.pos=1&req.ext.wrapper.profileid=11133&imp.vid.startdelay=0&imp.vid.linearity=1&imp.vid.playbackmethod=1&imp.vid.minduration=1&imp.vid.maxduration=30&imp.vid.w=1920&imp.vid.h=1080&imp.vid.api=7&imp.vid.skip=0&imp.vid.minbitrate=2000&dev.ip=[ENTER_ADSERVER_MACRO_TO_PASS_DEVICEIP]&dev.ua=[ENTER_ADSERVER_MACRO_TO_PASS_USERAGENT]&dev.ifa=[ENTER_ADSERVER_MACRO_TO_PASS_DEVICEID]

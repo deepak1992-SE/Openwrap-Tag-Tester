@@ -1,0 +1,4013 @@
+OpenWrap OTT video API specification
+OpenWrap supports OTT inventory using GET/POST methods. OpenWrap accepts BidRequest in OpenRTB 2.5 format for POST API, and the same
+specification for GET API, but using only key/value pairs.
+This endpoint returns standard VAST XML document. In case of error it returns an empty vast tag.
+http
+XML
+If there is failure in serving VAST server responds with X-Ow-Status header with JSON value containing
+VAST GET endpoint
+Sample Request	⚓
+https://ow.pubmatic.com/video/vast?
+app.pub.id=5890&req.ext.wrapper.profileid=14330&imp.tagid=scenario_1&imp.vid.ext.adpod.adminduration=5&imp.vid.ext.adpod.admaxduratio
+Sample Response
+<VAST version="3.0">
+<Ad id="scenario_1_adid" sequence="1">
+<Wrapper>
+<AdSystem>
+<![CDATA[PubMatic]]>
+</AdSystem>
+<VASTAdTagURI>
+<![CDATA[https://ads.pubmatic.com/AdServer/js/ott/sampleads/scenario_2.xml]]>
+</VASTAdTagURI>
+<Impression>
+<![CDATA[https://t.pubmatic.com/wt?
+adv=&af=video&aps=1&asip=1&au=scenario_1&bc=googssu_test_bidder&bidid=0d96c955-5b85-4645-a5bb-
+f5b381115847&cc=US&di=-1&dur=10&eg=9&en=9&fsrc=0&ft=1&iid=e8f14b91-e5e2-4c8e-94b5-
+ffe9910b9305&kgpv=scenario_1%40google.com%40693&orig=google.com&origbidid=3304005840955571719&pb=9.00&pdvid=16&pid=14330&plt=3&pn=vas
+</Impression>
+<Impression>
+<![CDATA[https://example.com/impression]]>
+</Impression>
+<Extensions>
+<Extension>
+<Pricing model="CPM" currency="USD">
+<![CDATA[9]]>
+</Pricing>
+</Extension>
+</Extensions>
+<Error>
+<![CDATA[https://st.pubmatic.com/track?
+operId=8&adv=&au=scenario_1&bc=googssu_test_bidder&crId=cr_4801976892356705441&p=5890&pfi=3&pid=14330&pn=vastbidder&sURL=google.com&t
+[ERRORCODE]]]>
+</Error>
+</Wrapper>
+</Ad>
+</VAST>
+Error
+ 	 Wrapper Solutions
+OpenWrap OTT video API specification
+
+Search 	⌘K	
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	1/43
+
+-- 1 of 43 --
+
+Example
+See possible errors.
+See Get API parameters
+Refer to this section.
+Refer to endpoint assumptions.
+Google SSU supports VAST 3 and VAST 4 only. So ensure that imp.vid.protocols is recommended values are 3, 6, 7, 8.
+See video protocols for more on values.
+The JSON endpoint will cache all individual creatives for an ad pod and return the targeting keys for those creatives.
+This endpoint will be used for integrating OpenWrap with SSAI and GAM for OTT inventory.
+It is a map of the key-value objects which signifies targeting keys of the bid object. Below are some standard targeting keys.
+Key 	Partner Level Key 	Description 	Example
+s<slotNo>_pwtdur 	N/A 	Duration of the video.
+slotNo represents the current ad slot
+number. For example, s1=slot 1, s2=slot 2,
+"s1_pwtdur"="60"
+ErrorCode 	Description
+Error 	Integer error code
+Error 	Granular error message
+{
+"ErrorCode": 700,
+"Error": "Missing Profile ID"
+}
+Query Parameters
+Handling Extended User IDs (EIDs)
+Assumptions
+Google SSU Integration
+JSON endpoint response
+Response object
+Key 	Type 	Description
+adpod 	Array of adpod objects 	Contains targeting key values for each impression and its respective slots.
+ext 	Object 	Holds debug information.
+AdPod object
+Key 	Type 	Description
+id 	String 	Contains Impression ID.
+targeting 	Array of targeting
+object
+Contains targeting objects for all ad slots of the adpod.
+ext 	Object 	Holds ad pod-specific extension parameter.
+modifiedurl 	String 	modifiedurl is owredirect updated with custom targeting keys. modifiedurl will always be present in response
+when owredirect is present, and is independent of the f parameter value.
+Targeting object
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	2/43
+
+-- 2 of 43 --
+
+etc.
+s<slotNo>_pwtcat 	N/A 	Bid category.
+This targeting key is available only when,
+supportdeals=true. See, Prioritizing deals for
+Ad Pods.
+Interpreted as:
+pb = price bucket of the bid.
+cat = bid category.
+dur = duration of video bid.
+For example, passing, 10.00_sports_5s,
+indicates:
+pb (price bucket of the bid) = $10.00
+cat (bid category) = IAB Sports category.
+dur (duration of video bid) = duration of 5
+seconds.
+"s1_pwtcat"="sports"
+s<slotNo>_pwtpb 	N/A 	Price bucket.
+This is the adpod ad slot key, here the ad
+slot represents the current adpod ad slot
+number. For example, s1, s2, s3, etc.
+This targeting key represents the price
+bucket of the bids
+"s1_pwtpb"="10.00"
+s<slotNo>_pwtcid 	N/A 	Cache ID.
+Cache ID of adslot of adpod.
+This is the adpod ad slot key, here the ad
+slot represents the current adpod ad slot
+number. For example, s1, s2, s3, etc.
+This targeting key is available only when,
+supportdeals=true..
+Interpreted as:
+pb = price bucket of the bid.
+cat = bid category.
+dur = duration of video bid.
+For example, passing, 10.00_sports_5s,
+indicates:
+pb (price bucket of the bid) = $10.00
+cat (bid category) = IAB Sports category.
+dur (duration of video bid) = duration of 5
+seconds.
+"s1_pwtcid"="2f54fe21-6e9b-467a-9e35-
+f1d9b6c6880e"
+s<slotNo>_pwtpid 	pwtpid_<partnerName> 	Partner name.
+Partner name
+This is the adpod adslot key, here the adslot
+represents the current adpod adslot number.
+For example, s1, s2, s3, etc.
+"s1_pwtpid"="pubmatic"
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	3/43
+
+-- 3 of 43 --
+
+s<slotNo>_pwtdid 	pwtdid_<partnerName> 	Deal ID 	"s1_pwtcid"="PUBDEAL"
+s<slotNo>_pwtpid 	pwtpid_<partnerName> 	Partner name 	"s1_pwtpid"="pubmatic"
+pwtbst 	pwtbst_<partnerName> 	Winning bid status
+1: Winning bid
+0: Non-winning bid
+"pwtbst":"1"
+"pwtbst_pubmatic":"1"
+pwtecp 	pwtecp_<partnerName> 	eCPM value 	"pwtecp":"5.00"
+"pwtecp_pubmatic":"5.00"
+s<slotNo>_pwtpid 	pwtpid_<partnerName> 	Partner name 	"s1_pwtpid"="pubmatic"
+pwtsid 	pwtsid_<partnerName> 	Slot ID 	"pwtsid":"47samurai_0x0_OW_CTV"
+"pwtsid_pubmatic":"47samurai_0x0_OW_CTV"
+pwtsz 	pwtsz_<partnerName> 	Ad Size in WIDTHxHEIGHT 	"pwtsz":"0x0"
+"pwtsz_pubmatic":"0x0"
+pwtprofid 	Profile ID 	"pwtprofid":"2375"
+pwtpubid 	Publisher ID 	"pwtpubid":"159396"
+pwtverid 	Version ID 	"pwtverid":"1"
+pwtplt 	Platform
+display
+amp
+in-app
+video
+"pwtplt":"video"
+pwtcurl 	OpenWrap cache URL 	"pwtcurl":" https://ow.pubmatic.com "
+pwtcpath 	OpenWrap cache path 	"pwtcpath":"/cache"
+s<slotNo>_pwtcat 	This targeting key is available only when,
+supportdeals=true.
+Interpreted as:
+pb = price bucket of the bid.
+cat = bid category.
+dur = duration of video bid.
+For example, passing, 10.00_sports_5s,
+indicates:
+pb (price bucket of the bid) = $10.00
+cat (bid category) = IAB Sports category.
+dur (duration of video bid) = duration of 5
+seconds.
+"s1_pwtcat"="sports"
+s_pwtdt 	N/A 	Deal Priority targeting.
+This targeting key is only available when:
+supportdeals=true
+"s1_pwtdt"="pubm8"
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	4/43
+
+-- 4 of 43 --
+
+Deal tier configuration is present in the
+request.
+Bid response has deal priority.
+_dealtier is satisfied. For example,
+s1_pwtdt="pubm8" where "pubm" is the
+_dealtier prefix, and "8" is the deal
+priority in the bid response.
+Content-Type 	application/json
+X-Ow-Status 	Error details
+ErrorCode – Integer error code
+Error – Granular error message
+Sample Error Details Expand source
+{"ErrorCode":700,"Error":"Missing Profile ID"}
+Endpoint Example:
+JSON
+Valid JSON Response Example with Response Headers:
+Response headers
+{
+"adpods": [
+{
+"id": "28635736ddc2bb1",
+"targeting": [
+{
+"s1_pwtcid": "20c47868-0d3b-43a7-9f40-70aad3cf9db7",
+"s1_pwtdid": "PUBDEAL1",
+"s1_pwtdur": "35",
+"s1_pwtpb": "5.00",
+"s1_pwtcat": "sports",
+"s1_pwtpid": "pubmatic"
+},
+{
+"s2_pwtcid": "24e0638a-224e-4a61-83e4-90a17ade1e4b",
+"s2_pwtdid": "PUBDEAL2",
+"s2_pwtdur": "30",
+"s2_pwtpb": "15.00",
+"s2_pwtcat": "sports",
+"s2_pwtpid": "pubmatic"
+},
+{
+"s3_pwtcid": "1fc70e5b-f738-4f3a-a20b-92489e53fa78",
+"s3_pwtdur": "20",
+"s3_pwtpb": "10.00",
+"s3_pwtcat": "sports",
+"s3_pwtpid": "appnexus"
+},
+{
+"s4_pwtcid": "2f54fe21-6e9b-467a-9e35-f1d9b6c6880e",
+"s4_pwtdur": "25",
+"s4_pwtpb": "5.00",
+"s4_pwtcat": "sports",
+"s4_pwtpid": "pubmatic"
+}
+]
+}
+]
+}
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	5/43
+
+-- 5 of 43 --
+
+JSON
+The following parameters are only supported for Video/JSON endpoint GET method:
+{
+"adpods": [
+{
+"id": "28635736ddc2bb1",
+"targeting": [
+{
+"pwtbst": "1",
+"pwtbst_pubmatic": "1",
+"pwtcid": "20c47868-0d3b-43a7-9f40-70aad3cf9db7",
+"pwtcid_pubmatic": "20c47868-0d3b-43a7-9f40-70aad3cf9db7",
+"pwtcpath": "/cache",
+"pwtcurl": "https://ow.pubmatic.com",
+"pwtdid": "PUBDEAL1",
+"pwtdid_pubmatic": "PUBDEAL1",
+"pwtdur": "35",
+"pwtecp": "5.00",
+"pwtecp_pubmatic": "5.00",
+"pwtpb_cat_dur":"10.00_sports_5s",
+"pwtpid": "pubmatic",
+"pwtpid_pubmatic": "pubmatic",
+"pwtplt": "video",
+"pwtprofid": "2375",
+"pwtpubid": "159396",
+"pwtsid": "47samurai_0x0_OW_CTV",
+"pwtsid_pubmatic": "47samurai_0x0_OW_CTV",
+"pwtsz": "0x0",
+"pwtsz_pubmatic": "0x0",
+"pwtverid": "1"
+},
+{
+"pwtbst": "1",
+"pwtbst_pubmatic": "1",
+"pwtcid": "24e0638a-224e-4a61-83e4-90a17ade1e4b",
+"pwtcid_pubmatic": "24e0638a-224e-4a61-83e4-90a17ade1e4b",
+"pwtcpath": "/cache",
+"pwtcurl": "https://ow.pubmatic.com",
+"pwtdid": "PUBDEAL1",
+"pwtdid_pubmatic": "PUBDEAL1",
+"pwtdur": "35",
+"pwtecp": "5.00",
+"pwtecp_pubmatic": "5.00",
+"pwtpid": "pubmatic",
+"pwtpid_pubmatic": "pubmatic",
+"pwtplt": "video",
+"pwtprofid": "2375",
+"pwtpubid": "159396",
+"pwtsid": "47samurai_0x0_OW_CTV",
+"pwtsid_pubmatic": "47samurai_0x0_OW_CTV",
+"pwtsz": "0x0",
+"pwtsz_pubmatic": "0x0",
+"pwtverid": "1"
+},
+{
+"pwtbst": "1",
+"pwtbst_pubmatic": "1",
+"pwtcid": "1fc70e5b-f738-4f3a-a20b-92489e53fa78",
+"pwtcid_pubmatic": "1fc70e5b-f738-4f3a-a20b-92489e53fa78",
+"pwtcpath": "/cache",
+"pwtcurl": "https://ow.pubmatic.com",
+"pwtdid": "PUBDEAL1",
+"pwtdid_pubmatic": "PUBDEAL1",
+"pwtdur": "35",
+"pwtecp": "5.00",
+"pwtecp_pubmatic": "5.00",
+"pwtpid": "pubmatic",
+"pwtpid_pubmatic": "pubmatic",
+"pwtplt": "video",
+"pwtprofid": "2375",
+"pwtpubid": "159396",
+"pwtsid": "47samurai_0x0_OW_CTV",
+"pwtsid_pubmatic": "47samurai_0x0_OW_CTV",
+"pwtsz": "0x0",
+Request Parameters for OpenWrap between SSAI and GAM (JSON Endpoint - GET)
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	6/43
+
+-- 6 of 43 --
+
+Parameters
+Data
+Type
+Description 	Example
+request.ext.wrapper.ssai 	string 	Identifies the name of the SSAI vendor from which the
+request is sent.
+This parameter will be used in tracker URLs to identify
+the SSAI vendor who made the bid request.
+This parameter is optional.
+"mediatailor"
+f 	string 	Response format for JSON endpoint.
+Supported values for f:
+1. redirect : Use when bids are to be redirected to
+GAM (302 redirect)
+2. json: JSON formatted response from OpenWrap
+(existing behavour).
+Default value of f parameter is json
+"json"/ "redirect"
+owredirect 	string 	Identifies the GAM URL where bids need to be
+redirected.
+Use only when f="redirect"
+OpenWrap and cust_params:
+The summary of the OpenWrap bids will be added
+in the cust_params in GAM URL.
+Existing values cust_params will be retained and
+OpenWrap will append the new values.
+If there are key conflicts, then OpenWrap will
+replace its values. For example, if the publisher
+provided cust_params contains s1_pwtpb=456,
+and OpenWrap determines its value as
+s1_pwtpb=789, then OpenWrap will replace 456
+with 789 (because s1_pwtpb is reserved key for
+OpenWrap).
+Reserved keys for OpenWrap in case
+of cust_params:
+<NO> will be replaced with slot no
+See Reserved Keys table below.
+https://pubads.g.doubleclick.net/gampad/ads?
+cust_params=s1_pwtpb%3D123
+OpenWrap supports CTV inventory as defined in the Object: Video section of the IAB OpenRTB API Specification Version 2.5, with some minor
+differences. For example, PubMatic's CTV BidRequest implementation supports multiple video impressions. The following sample shows how a typical
+impression might appear using the /video/vast endpoint.
+The CTV Video API supports three endpoints:
+1. /video/openrtb
+2. /video/vast
+"pwtsz_pubmatic": "0x0",
+"pwtverid": "1"
+},
+{
+"pwtbst": "1",
+"pwtbst_pubmatic": "1",
+"pwtcid": "2f54fe21-6e9b-467a-9e35-f1d9b6c6880e",
+"pwtcid_pubmatic": "2f54fe21-6e9b-467a-9e35-f1d9b6c6880e",
+"pwtcpath": "/cache",
+"pwtcurl": "https://ow.pubmatic.com",
+"pwtdid": "PUBDEAL1",
+"pwtdid_pubmatic": "PUBDEAL1",
+"pwtdur": "35",
+"pwtecp": "5.00",
+"pwtecp_pubmatic": "5.00",
+"pwtpid": "pubmatic",
+"pwtpid_pubmatic": "pubmatic",
+"pwtplt": "video",
+"pwtprofid": "2375",
+"pwtpubid": "159396",
+"pwtsid": "47samurai_0x0_OW_CTV",
+"pwtsid_pubmatic": "47samurai_0x0_OW_CTV",
+"pwtsz": "0x0",
+"pwtsz_pubmatic": "0x0",
+"pwtverid": "1"
+}
+]
+}
+],
+"ext": {
+"debug": {
+"adpod": {
+"bidresponse": {
+"id": "1559039248176",
+"seatbid": [
+{
+"bid": [
+{
+"id": "1-VIDEO12-89A1-41F1-8708-978FD3C0912A",
+"impid": "28635736ddc2bb1_1",
+"price": 5,
+"adm":
+Reserved Keys
+Reserved Key 	Description 	Example
+s<NO>_pwtpb 	Bid Price Bucket 	s1_pwtpb
+s<NO>_pwtcid 	Creative cache ID 	s1_pwtcid
+s<NO>_pwtdur 	Ad Duration 	s1_pwtdur
+s<NO>_pwtpid 	Partner ID 	s1_pwtpid
+POST API
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	7/43
+
+-- 7 of 43 --
+
+3. /video/json
+HTTP
+"<VAST version=\"3.0\"><Ad id=\"601364\"><InLine><AdSystem><![CDATA[Acudeo Compatible]]></AdSystem><AdTitle><!
+[CDATA[VAST 2.0 Instream Test 1]]></AdTitle><Description><![CDATA[VAST 2.0 Instream Test 1]]></Description>
+<Impression><![CDATA[//10.110.194.12:8842/wt?bidid=1-VIDEO12-89A1-41F1-8708-
+978FD3C0912A&eg=5&en=5&iid=64b474fd-6dd9-4d55-bef1-
+e8769070461a&kgpv=47samurai_0x0_OW_CTV%400x0&pdvid=1&pid=2375&pn=pubmatic&pubid=159396&purl=http%3A%2F%2Febay.com%2Finte%2Fautomation
+</Impression><Impression><![CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-
+qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ41&imprId=48F73E1A-7F23-443D-
+A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]></Impression><Impression><!
+[CDATA[https://dsptracker.com/{PSPM}]]></Impression><Error><![CDATA[//127.0.0.1:8080/wt?
+operId=8&crId=creative-1_1_2&p=159396&pid=2375&pn=pubmatic&ts=1599648628&v=1&ier=[ERRORCODE]]]></Error><Error>
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]></Error><Creatives><Creative AdID=\"601364\"><Linear
+skipoffset=\"70%\"><TrackingEvents><Tracking event=\"close\"><![CDATA[https://mytracking.com/linear/close]]>
+</Tracking><Tracking event=\"skip\"><![CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking
+event=\"creativeView\"><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event=\"start\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]></Tracking><Tracking event=\"midpoint\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]></Tracking><Tracking event=\"firstQuartile\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]></Tracking><Tracking event=\"thirdQuartile\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]></Tracking><Tracking event=\"complete\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]></Tracking></TrackingEvents><Duration><!
+[CDATA[00:00:04]]></Duration><VideoClicks><ClickTracking><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]></ClickTracking><ClickThrough><!
+[CDATA[https://www.pubmatic.com]]></ClickThrough></VideoClicks><MediaFiles><MediaFile delivery=\"progressive\"
+type=\"video/mp4\" bitrate=\"500\" width=\"400\" height=\"300\" scalable=\"true\"
+maintainAspectRatio=\"true\"><![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile></MediaFiles></Linear></Creative></Creatives><Pricing model=\"CPM\"><![CDATA[5]]></Pricing>
+</InLine></Ad></VAST>" 	,
+"adomain": [
+"ae.com"
+],
+"cid": "17050",
+"crid": "creative-1_1_2",
+"dealid": "PUBDEAL1",
+"h": 0,
+"w": 0,
+"ext": {
+"partner": "pubmatic",
+"adpod": {
+"aprc": 1
+},
+"prebid": {
+"targeting": {
+"pwtpb": "5.00"
+}
+},
+"video": {
+"minduration": 80,
+"maxduration": 140,
+Sample HTTP POST Impression
+curl -v --location --request POST 'http://172.16.4.192:7878/video/vast' \
+--header 'Content-Type: text/plain' \
+--data-raw '{
+"id": "1559039248176",
+"imp": [
+{
+"id": "28635736ddc2bb",
+"video": {
+"pos": 7,
+"companionad": [
+{
+"pos": 7,
+"format": [
+{
+"w": 320,
+"h": 480
+}
+],
+"api": [
+5,
+6,
+7
+]
+}
+],
+"maxbitrate": 2000,
+"minduration": 15,
+"protocols": [
+2,
+3,
+5,
+6,
+7,
+8
+],
+"mimes": [
+"video/3gpp",
+"video/mp4",
+"video/webm"
+],
+"linearity": 1,
+"boxingallowed": 1,
+"playbackmethod": [
+1
+],
+"delivery": [
+2
+],
+"companiontype": [
+1,
+2,
+3
+],
+"placement": 5,
+"playbackend": 1,
+"startdelay": 0
+},
+"tagid": "/15671365/DMDemo",
+"secure": 0,
+"ext": {
+"bidder": {}
+}
+}
+],
+"app": {
+"name": "OpenWrapperSample",
+"bundle": "com.pubmatic.openbid.app",
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	8/43
+
+-- 8 of 43 --
+
+OpenWrap's HTTP POST method ignores banner, native, and audio objects.
+The table below lists JSON payload snippets that illustrate OpenRTB 2.5 structures that OpenWrap does not support at this time.
+Object 	Description
+BidRequest.Imp.Banner 	Full banner object unsupported. OpenWrap ignores the impression object if it contains a banner object.
+Sample impression with banner object Expand source
+Input BidRequest with banner object
+{
+"imp":[{
+...
+"banner":{},
+...
+}]
+}
+Resulting BidRequest
+{
+"imp":[] /*Removed banner object and impression*/
+}
+OpenWrap removes a banner object from an impression when it is specified with a video object in the same impression.
+Sample impression with banner and video Expand source
+Input BidRequest with banner and video objects
+{
+"imp":[{
+...
+"banner":{},
+"video": {},
+...
+}]
+}
+Resulting BidRequest used throughout
+{
+"imp":[{
+"skip": 1,
+"skipmin": 10,
+"skipafter": 15,
+"battr": [
+6,
+7
+],
+"playbackmethod": [
+1
+]
+}
+}
+},
+{
+"id": "2-VIDEO12-89A1-41F1-8708-978FD3C0912A",
+"impid": "28635736ddc2bb1_2",
+"price": 5,
+"adm":
+"<VAST version=\"3.0\"><Ad id=\"601364\"><InLine><AdSystem><![CDATA[Acudeo Compatible]]></AdSystem><AdTitle><!
+[CDATA[VAST 2.0 Instream Test 1]]></AdTitle><Description><![CDATA[VAST 2.0 Instream Test 1]]></Description>
+<Impression><![CDATA[//10.110.194.12:8842/wt?bidid=2-VIDEO12-89A1-41F1-8708-
+978FD3C0912A&eg=5&en=5&iid=64b474fd-6dd9-4d55-bef1-
+e8769070461a&kgpv=47samurai_0x0_OW_CTV%400x0&pdvid=1&pid=2375&pn=pubmatic&pubid=159396&purl=http%3A%2F%2Febay.com%2Finte%2Fautomation
+</Impression><Impression><![CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-
+qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ41&imprId=48F73E1A-7F23-443D-
+A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]></Impression><Impression><!
+[CDATA[https://dsptracker.com/{PSPM}]]></Impression><Error><![CDATA[//127.0.0.1:8080/wt?
+operId=8&crId=creative-1_1_2&p=159396&pid=2375&pn=pubmatic&ts=1599648628&v=1&ier=[ERRORCODE]]]></Error><Error>
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]></Error><Creatives><Creative AdID=\"601364\"><Linear
+skipoffset=\"70%\"><TrackingEvents><Tracking event=\"close\"><![CDATA[https://mytracking.com/linear/close]]>
+</Tracking><Tracking event=\"skip\"><![CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking
+event=\"creativeView\"><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event=\"start\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]></Tracking><Tracking event=\"midpoint\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]></Tracking><Tracking event=\"firstQuartile\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]></Tracking><Tracking event=\"thirdQuartile\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]></Tracking><Tracking event=\"complete\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]></Tracking></TrackingEvents><Duration><!
+[CDATA[00:00:04]]></Duration><VideoClicks><ClickTracking><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]></ClickTracking><ClickThrough><!
+[CDATA[https://www.pubmatic.com]]></ClickThrough></VideoClicks><MediaFiles><MediaFile delivery=\"progressive\"
+type=\"video/mp4\" bitrate=\"500\" width=\"400\" height=\"300\" scalable=\"true\"
+maintainAspectRatio=\"true\"><![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile></MediaFiles></Linear></Creative></Creatives><Pricing model=\"CPM\"><![CDATA[5]]></Pricing>
+</InLine></Ad></VAST>" 	,
+"adomain": [
+"ae.com"
+],
+"storeurl": "https://itunes.apple.com/?videobid=12",
+"ver": "1.0",
+"publisher": {
+"id": "5890"
+},
+"ext": {
+"inventorypartnerdomain":"programmerA.com"
+},
+},
+"device": {
+"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)
+Mobile/15E148",
+"dnt": 0,
+"lmt": 1,
+"ip": "172.16.8.74",
+"ipv6": "2001:db8::8a2e:370:7334",
+"devicetype": 1,
+"make": "Apple",
+"model": "iPhone X",
+"os": "ios",
+"osv": "10",
+"hwv": "10x",
+"h": 768,
+"w": 1366,
+"ppi": 4096,
+"pxratio": 1.3,
+"js": 1,
+"geofetch": 0,
+"flashver": "1.1",
+"language": "en-US",
+"carrier": "VERIZON",
+"mccmnc": "310-005",
+"connectiontype": 2,
+"ifa": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"didsha1": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"didmd5": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"dpidsha1": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"dpidmd5": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"macsha1": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"macmd5": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"geo": {
+"lat": 72.6,
+"lon": 72.6,
+"type": 1,
+"accuracy": 10,
+"lastfix": 0,
+"ipservice": 1,
+"country": "Ind",
+"region": "Maharashtra",
+"regionfips104": "MAHA",
+"metro": "Mumbai",
+"city": "Mumbai",
+"zip": "123456",
+"utcoffset": 120
+}
+},
+"user": {
+"geo": {}
+},
+"source": {
+"tid": "edc7717c-ca43-4ad6-b2a1-354bd8b10f78"
+},
+"at": 1,
+"cur": [
+"USD"
+],
+"ext": {
+"extra-key": 123,
+"wrapper": {
+"profileid": 3514,
+"versionid": 1,
+"ssauction": 0,
+"sumry_disable": 0,
+"clientconfig": 1
+}
+POST API Limitations
+Unsupported examples
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	9/43
+
+-- 9 of 43 --
+
+Object 	Description
+...
+/*Removed banner object*/
+"video": {},
+...
+}]
+}
+BidRequest.Imp.Audio 	OpenWrap ignores impression object if it contains an unsupported audio object.
+Sample impression with audio Expand source
+Input BidRequest with audio object
+{
+"imp":[{
+...
+"audio":{},
+...
+}]
+}
+Resulting BidRequest
+{
+"imp":[] /*Removed audio object and impression*/
+}
+OpenWrap removes an audio object from an impression if it is specified with video object in the same impression.
+Sample impression with audio and video Expand source
+Input BidRequest with audio and video objects
+{
+"imp":[{
+...
+"audio":{},
+"video": {},
+...
+}]
+}
+Resulting BidRequest used throughout
+"cid": "17050",
+"crid": "creative-1_1_2",
+"dealid": "PUBDEAL1",
+"h": 0,
+"w": 0,
+"ext": {
+"partner": "pubmatic",
+"adpod": {
+"aprc": 1
+},
+"prebid": {
+"targeting": {
+"pwtpb": "5.00"
+}
+},
+"video": {
+"minduration": 80,
+"maxduration": 140,
+"skip": 1,
+"skipmin": 10,
+"skipafter": 15,
+"battr": [
+6,
+7
+],
+"playbackmethod": [
+1
+]
+}
+}
+},
+{
+"id": "3-VIDEO12-89A1-41F1-8708-978FD3C0912A",
+"impid": "28635736ddc2bb1_3",
+"price": 5,
+"adm":
+}
+}'
+Note: Unnecessary use of -X or --request, POST is already inferred.
+* 	Trying 172.16.4.192:7878...
+* TCP_NODELAY set
+* Connected to 172.16.4.192 (172.16.4.192) port 7878 (#0)
+> POST /video/vast HTTP/1.1
+> Host: 172.16.4.192:7878
+> User-Agent: curl/7.65.2
+> Accept: */*
+> Content-Type: text/plain
+> Content-Length: 1997
+> Expect: 100-continue
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 100 Continue
+* We are completely uploaded and fine
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Access-Control-Allow-Origin: *
+< Content-Type: application/xml
+< Date: Fri, 27 Mar 2020 16:37:11 GMT
+< Transfer-Encoding: chunked
+<
+<VAST version="3.0">
+<Ad id="601364">
+<InLine>
+<AdSystem>
+<![CDATA[Acudeo Compatible]]>
+</AdSystem>
+<AdTitle>
+<![CDATA[VAST 2.0 Instream Test 1]]>
+</AdTitle>
+<Description>
+<![CDATA[VAST 2.0 Instream Test 1]]>
+</Description>
+<Impression>
+<![CDATA[//t.pubmatic.com/wt?bidid=28635736ddc2bb&eg=12&en=12&iid=aa5237b4-ba9e-4960-ad9c-
+2910aa9e1346&kgpv=%2F15671365%2FDMDemo%400x0&pdvid=1&pid=3514&pn=pubmatic&pubid=5890&purl=https%3A%2F%2Fitunes.apple.com%2F%3Fvideobi
+</Impression>
+<Impression>
+<![CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-
+qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ41&imprId=48F73E1A-7F23-443D-
+A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]>
+</Impression>
+<Impression>
+<![CDATA[https://dsptracker.com/{PSPM}]]>
+</Impression>
+<Error>
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]>
+</Error>
+<Error>
+<![CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]>
+</Error>
+<Creatives>
+<Creative AdID="601364">
+<Linear skipoffset="70%">
+<TrackingEvents>
+<Tracking event="close">
+<![CDATA[https://mytracking.com/linear/close]]>
+</Tracking>
+<Tracking event="skip">
+<![CDATA[https://mytracking.com/linear/skip]]>
+</Tracking>
+<Tracking event="creativeView">
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	10/43
+
+-- 10 of 43 --
+
+Object 	Description
+{
+"imp":[{
+...
+/*Removed audio object*/
+"video": {},
+...
+}]
+}
+BidRequest.Imp.Native 	Full native object not supported. OpenWrap ignores impressions when they contain a native object.
+Sample impression with native object; native object is removed. Expand source
+Input BidRequest with native object
+{
+"imp":[{
+...
+"native":{},
+...
+}]
+}
+Resulting BidRequest
+{
+"imp":[] /*Removed native object and impression*/
+}
+OpenWrap removes the native object from the impression if it is specified with a video object in the same impression.
+Sample impression with native + video objects; native object is removed Expand source
+Input BidRequest with native and video objects
+{
+"imp":[{
+...
+"native":{},
+"video": {},
+...
+"<VAST version=\"3.0\"><Ad id=\"601364\"><InLine><AdSystem><![CDATA[Acudeo Compatible]]></AdSystem><AdTitle><!
+[CDATA[VAST 2.0 Instream Test 1]]></AdTitle><Description><![CDATA[VAST 2.0 Instream Test 1]]></Description>
+<Impression><![CDATA[//10.110.194.12:8842/wt?bidid=3-VIDEO12-89A1-41F1-8708-
+978FD3C0912A&eg=5&en=5&iid=64b474fd-6dd9-4d55-bef1-
+e8769070461a&kgpv=47samurai_0x0_OW_CTV%400x0&pdvid=1&pid=2375&pn=pubmatic&pubid=159396&purl=http%3A%2F%2Febay.com%2Finte%2Fautomation
+</Impression><Impression><![CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-
+qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ41&imprId=48F73E1A-7F23-443D-
+A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]></Impression><Impression><!
+[CDATA[https://dsptracker.com/{PSPM}]]></Impression><Error><![CDATA[//127.0.0.1:8080/wt?
+operId=8&crId=creative-1_1_2&p=159396&pid=2375&pn=pubmatic&ts=1599648628&v=1&ier=[ERRORCODE]]]></Error><Error>
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]></Error><Creatives><Creative AdID=\"601364\"><Linear
+skipoffset=\"70%\"><TrackingEvents><Tracking event=\"close\"><![CDATA[https://mytracking.com/linear/close]]>
+</Tracking><Tracking event=\"skip\"><![CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking
+event=\"creativeView\"><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event=\"start\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]></Tracking><Tracking event=\"midpoint\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]></Tracking><Tracking event=\"firstQuartile\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]></Tracking><Tracking event=\"thirdQuartile\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]></Tracking><Tracking event=\"complete\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]></Tracking></TrackingEvents><Duration><!
+[CDATA[00:00:04]]></Duration><VideoClicks><ClickTracking><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]></ClickTracking><ClickThrough><!
+[CDATA[https://www.pubmatic.com]]></ClickThrough></VideoClicks><MediaFiles><MediaFile delivery=\"progressive\"
+type=\"video/mp4\" bitrate=\"500\" width=\"400\" height=\"300\" scalable=\"true\"
+maintainAspectRatio=\"true\"><![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile></MediaFiles></Linear></Creative></Creatives><Pricing model=\"CPM\"><![CDATA[5]]></Pricing>
+</InLine></Ad></VAST>" 	,
+"adomain": [
+"ae.com"
+],
+"cid": "17050",
+"crid": "creative-1_1_2",
+"dealid": "PUBDEAL1",
+"h": 0,
+"w": 0,
+"ext": {
+"partner": "pubmatic",
+"adpod": {
+"aprc": 1
+},
+"prebid": {
+"targeting": {
+"pwtpb": "5.00"
+}
+},
+"video": {
+"minduration": 80,
+"maxduration": 140,
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]>
+</Tracking>
+<Tracking event="start">
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]>
+</Tracking>
+<Tracking event="midpoint">
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]>
+</Tracking>
+<Tracking event="firstQuartile">
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]>
+</Tracking>
+<Tracking event="thirdQuartile">
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]>
+</Tracking>
+<Tracking event="complete">
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]>
+</Tracking>
+</TrackingEvents>
+<Duration>
+<![CDATA[00:00:04]]>
+</Duration>
+<VideoClicks>
+<ClickTracking>
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]>
+</ClickTracking>
+<ClickThrough>
+<![CDATA[https://www.pubmatic.com]]>
+</ClickThrough>
+</VideoClicks>
+<MediaFiles>
+<MediaFile delivery="progressive" type="video/mp4" bitrate="500" width="400"
+height="300" scalable="true" maintainAspectRatio="true">
+<![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile>
+</MediaFiles>
+</Linear>
+</Creative>
+</Creatives>
+<Pricing model="CPM" currency="USD">
+<![CDATA[12]]>
+</Pricing>
+</InLine>
+</Ad>
+</VAST>
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	11/43
+
+-- 11 of 43 --
+
+Object 	Description
+}]
+}
+Resultant BidRequest used throughout
+{
+"imp":[{
+...
+/*Removed native object*/
+"video": {},
+...
+}]
+}
+Using HTTP GET, you'll send all BidRequest parameters and values encoded in the URL. The sections below show the Required parameters, followed
+by the Optional parameters, and a brief example for each.
+OpenWrap rejects BidRequests that do not include the parameters in the following table.
+"skip": 1,
+"skipmin": 10,
+"skipafter": 15,
+"battr": [
+6,
+7
+],
+"playbackmethod": [
+1
+]
+}
+}
+},
+{
+"id": "4-VIDEO12-89A1-41F1-8708-978FD3C0912A",
+"impid": "28635736ddc2bb1_4",
+"price": 5,
+"adm":
+"<VAST version=\"3.0\"><Ad id=\"601364\"><InLine><AdSystem><![CDATA[Acudeo Compatible]]></AdSystem><AdTitle><!
+[CDATA[VAST 2.0 Instream Test 1]]></AdTitle><Description><![CDATA[VAST 2.0 Instream Test 1]]></Description>
+<Impression><![CDATA[//10.110.194.12:8842/wt?bidid=4-VIDEO12-89A1-41F1-8708-
+978FD3C0912A&eg=5&en=5&iid=64b474fd-6dd9-4d55-bef1-
+e8769070461a&kgpv=47samurai_0x0_OW_CTV%400x0&pdvid=1&pid=2375&pn=pubmatic&pubid=159396&purl=http%3A%2F%2Febay.com%2Finte%2Fautomation
+</Impression><Impression><![CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-
+qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ41&imprId=48F73E1A-7F23-443D-
+A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]></Impression><Impression><!
+[CDATA[https://dsptracker.com/{PSPM}]]></Impression><Error><![CDATA[//127.0.0.1:8080/wt?
+operId=8&crId=creative-1_1_2&p=159396&pid=2375&pn=pubmatic&ts=1599648628&v=1&ier=[ERRORCODE]]]></Error><Error>
+<![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]></Error><Creatives><Creative AdID=\"601364\"><Linear
+skipoffset=\"70%\"><TrackingEvents><Tracking event=\"close\"><![CDATA[https://mytracking.com/linear/close]]>
+</Tracking><Tracking event=\"skip\"><![CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking
+event=\"creativeView\"><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event=\"start\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]></Tracking><Tracking event=\"midpoint\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]></Tracking><Tracking event=\"firstQuartile\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]></Tracking><Tracking event=\"thirdQuartile\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]></Tracking><Tracking event=\"complete\"><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]></Tracking></TrackingEvents><Duration><!
+[CDATA[00:00:04]]></Duration><VideoClicks><ClickTracking><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]></ClickTracking><ClickThrough><!
+[CDATA[https://www.pubmatic.com]]></ClickThrough></VideoClicks><MediaFiles><MediaFile delivery=\"progressive\"
+type=\"video/mp4\" bitrate=\"500\" width=\"400\" height=\"300\" scalable=\"true\"
+maintainAspectRatio=\"true\"><![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile></MediaFiles></Linear></Creative></Creatives><Pricing model=\"CPM\"><![CDATA[5]]></Pricing>
+</InLine></Ad></VAST>" 	,
+"adomain": [
+"ae.com"
+],
+GET API parameters
+Required parameters
+OpenWrap Key 	ORTB 2.5 Key 	Type 	Description 	Example
+imp.tagid 	bidrequest.imp[0].tagid 	String 	The identifier for a
+specific ad
+placement or ad
+tag that initiated the
+auction. Use to
+troubleshoot issues
+and to help buyers
+optimize bids; for
+example, you can
+specify adUnitId
+here.
+/ID/SampleAdUnit
+imp.vid.mimes 	bidrequest.imp[0].video.mimes 	String
+Array
+Comma separated
+String Array.
+Supported content
+MIME types
+include:: video/x-
+ms-wmv and
+video/mp4.
+video%2F3gpp,video%2Fmp4,video%2Fwebm
+site.pub.id / app.pub.id 	bidrequest.site.publisher.id /
+bidrequest.app.publisher.id
+String 	Exchange-specific
+publisher ID.
+Requires at least
+one of either,
+site.pub.id or
+app.pub.id.
+12345
+req.ext.wrapper.profileid 	bidrequest.ext.wrapper.profileid 	Integer 	OpenWrap requires
+a specific profile id
+for inventory type.
+12345
+Optional parameters
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	12/43
+
+-- 12 of 43 --
+
+Use the objects/parameters below as needed on a case-by-case basis.
+The BidRequest object is the top-level parent for the other objects described in later sections. The next table shows the OpenWrap key to reference
+Req objects, and for comparison, the equivalent OpenRTB 2.5 key to reference BidRequest objects.
+The following table lists the parameters available to let you configure Req objects.
+Parameter 	Type 	Description 	Example
+id 	String 	The unique ID of the BidRequest, provided by the exchange. OpenWrap auto-generates
+this if you do not provide it.
+45067fec-eab7-4ca0-
+ad3a-87b01f21846a
+test 	Integer
+Default:
+0
+Boolean value that indicates test mode, in which auctions are not billable; for example, 0
+= live mode, 1 = test mode.
+1
+at 	Integer
+Default:
+2
+Auction type: 1 = First Price, 2 = Second Price Plus. Define exchange-specific auction
+types using values greater than 500.
+2
+tmax 	Integer 	Maximum time in milliseconds the exchange allows bids to be received, including
+Internet latency to avoid timeout. Supersedes any prior guidance from the exchange. Set
+this in the OpenWrap configuration file.
+100
+bseat 	String
+Array
+Blocklist of buyer seats (for example, advertisers, agencies), restricted from bidding on
+the impression. Bidders and the exchange must make the connection between seat IDs
+and the buyerʼs customers which the IDs represent.
+Use only one wseat and/or bseat in the same request. Omitting both implies there are no
+seat restrictions.
+nike,puma
+wseat 	String
+Array
+White list 	nike,puma
+allimps 	Integer
+Default:
+0
+Flags whether the exchange can verify that the offered impressions represent all
+available impressions in context (that is, all on the web page, or all video spots such as
+pre, mid, and post-roll), that support road-blocking. 0 = no or unknown, 1 = yes, the
+impressions offered represent all available.
+1
+wlang 	String
+Array
+White list of creative languages in ISO-639-1-alpha-2 alpha codes. Omission implies no
+specific restrictions, but buyers should consider language attributes in the Device and/or
+Content objects if available.
+en,ca
+cur 	String
+Array
+An array of allowed currencies for bids on a BidRequest using ISO-4217 alpha codes.
+Use only if the exchange accepts multiple currencies.
+Currently, server-side OpenWrap works with only USD…
+Server-side OpenWrap replaces any other currency with USD.
+USD
+bcat 	String
+Array
+Blocked advertiser categories using the IAB content categories. 	IAB-1,IAB-2
+badv 	String
+Array
+Blocklist of advertisers by their domains; for example, ford.com. 	ford.com,puma.com
+"cid": "17050",
+"crid": "creative-1_1_2",
+"dealid": "PUBDEAL1",
+"h": 0,
+"w": 0,
+"ext": {
+"partner": "pubmatic",
+"adpod": {
+"aprc": 1
+},
+"prebid": {
+"targeting": {
+"pwtpb": "5.00"
+}
+},
+"video": {
+"minduration": 80,
+"maxduration": 140,
+"skip": 1,
+"skipmin": 10,
+"skipafter": 15,
+"battr": [
+6,
+7
+],
+"playbackmethod": [
+1
+]
+}
+}
+}
+],
+"seat": "pubmatic"
+}
+],
+"cur": "USD"
+},
+"config": {
+"28635736ddc2bb1": {
+"vidext": {
+"offset": 0,
+"adpod": {
+"minads": 4,
+"maxads": 4,
+"adminduration": 30,
+"admaxduration": 40,
+"excladv": 100,
+"excliabcat": 100
+}
+},
+"imp": [
+{
+"id": "28635736ddc2bb1_1",
+"seq": 1,
+"minduration": 30,
+"maxduration": 35
+},
+{
+"id": "28635736ddc2bb1_2",
+"seq": 2,
+"minduration": 30,
+"maxduration": 35
+},
+{
+"id": "28635736ddc2bb1_3",
+"seq": 3,
+"minduration": 30,
+"maxduration": 35
+},
+{
+"id": "28635736ddc2bb1_4",
+"seq": 4,
+"minduration": 30,
+"maxduration": 35
+}
+BidRequest object
+OpenWrap Key 	ORTB 2.5 Key
+req.[param] 	bidrequest.[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	13/43
+
+-- 13 of 43 --
+
+bapp 	String
+Array
+Blocklist of apps by their platform-specific, exchange-independent identifiers.
+For Android, application IDs are bundle or package names; for example,
+com.foo.mygame.
+For iOS, these are numeric IDs that you can obtain through your Apple Developer
+account.
+com.foo.mygame,1234
+The BidRequest object supports ad pods.
+The Source object is a child of BidRequest described above. The next table shows the OpenWrap key to reference Src objects, and for comparison, the
+equivalent OpenRTB 2.5 key to reference Source objects.
+The following table lists the parameters available to let you configure Src objects.
+Parameter 	Type 	Description 	Example
+fd 	Integer 	Entity responsible for the final impression sale decision, where 0 = exchange, 1 = upstream
+source.
+1
+tid 	String 	Transaction ID common across all participants in a bid request, and potentially may
+represent multiple exchanges.
+45067fec-eab7-4ca0-ad3a-
+87b01f21846a
+pchain 	String 	Payment ID chain string containing embedded syntax described in the TAG Payment ID
+Protocol v1.0.
+5d62403b186f2ace:158309
+schain 	String 	SupplyChain object represents the links in the supply chain as well as an indicator as to
+whether the supply chain is complete.
+This value should be in serialized format and encoded. Refer to
+https://github.com/InteractiveAdvertisingBureau/openrtb/blob/master/supplychainobject.md
+to learn more about serializing the SupplyChain object.
+1.0,1!exchange1.com,1234,1,bid-
+request-
+1,publisher,publisher.com
+The Imp object is a child of BidRequest described above, and Imp objects are typically the parent of Video. The next table shows the OpenWrap key to
+reference Imp objects, and for comparison, the equivalent OpenRTB 2.5 key to reference Impression objects.
+The following table lists the parameters available to let you configure Imp objects.
+OpenWrap Key 	Type 	Description 	Example
+id 	String 	A unique identifier for this impression within
+the context of the bid request (typically,
+starts with 1 and increments.
+123
+displaymanager 	String 	Name of ad mediation partner, SDK
+technology, or player responsible for
+rendering ad (typically video or mobile).
+Used by some ad servers to customize ad
+code by a partner. Recommended for video
+and/or apps.
+PubMaticSDK
+]
+}
+}
+},
+"httpcalls": {
+"pubmatic": [
+{
+"requestbody":
+"{\"id\":\"1559039248176\",\"imp\":[{\"id\":\"28635736ddc2bb1_1\",\"video\":{\"mimes\":
+[\"video/3gpp\",\"video/mp4\",\"video/webm\"],\"minduration\":30,\"maxduration\":35,\"protocols\":
+[2,3,5,6,7,8],\"w\":320,\"h\":480,\"startdelay\":2,\"placement\":5,\"linearity\":1,\"skip\":1,\"skipmin\":10,\"skipafter\":15,\"seque
+[6,7],\"minbitrate\":1200,\"maxbitrate\":1999,\"boxingallowed\":1,\"playbackmethod\":
+[1],\"playbackend\":1,\"delivery\":[2],\"pos\":7,\"api\":[1,2],\"companiontype\":[1,2,3]},\"pmp\":
+{\"private_auction\":1,\"deals\":[{\"id\":\"123\",\"bidfloor\":1.2,\"bidfloorcur\":\"USD\",\"at\":1,\"wseat\":
+[\"IAB-1\",\"IAB-2\"],\"wadomain\":
+[\"WD1\",\"WD2\"]}]},\"displaymanager\":\"PubMaticSDK\",\"displaymanagerver\":\"PubMaticSDK-
+1.0\",\"instl\":1,\"tagid\":\"47samurai_0x0_OW_CTV\",\"bidfloor\":1.1,\"bidfloorcur\":\"USD\",\"secure\":0,\"iframebuster\":
+[\"1\"],\"exp\":1},{\"id\":\"28635736ddc2bb1_2\",\"video\":{\"mimes\":
+[\"video/3gpp\",\"video/mp4\",\"video/webm\"],\"minduration\":30,\"maxduration\":35,\"protocols\":
+[2,3,5,6,7,8],\"w\":320,\"h\":480,\"startdelay\":2,\"placement\":5,\"linearity\":1,\"skip\":1,\"skipmin\":10,\"skipafter\":15,\"seque
+[6,7],\"minbitrate\":1200,\"maxbitrate\":1999,\"boxingallowed\":1,\"playbackmethod\":
+[1],\"playbackend\":1,\"delivery\":[2],\"pos\":7,\"api\":[1,2],\"companiontype\":[1,2,3]},\"pmp\":
+{\"private_auction\":1,\"deals\":[{\"id\":\"123\",\"bidfloor\":1.2,\"bidfloorcur\":\"USD\",\"at\":1,\"wseat\":
+[\"IAB-1\",\"IAB-2\"],\"wadomain\":
+[\"WD1\",\"WD2\"]}]},\"displaymanager\":\"PubMaticSDK\",\"displaymanagerver\":\"PubMaticSDK-
+1.0\",\"instl\":1,\"tagid\":\"47samurai_0x0_OW_CTV\",\"bidfloor\":1.1,\"bidfloorcur\":\"USD\",\"secure\":0,\"iframebuster\":
+[\"1\"],\"exp\":1},{\"id\":\"28635736ddc2bb1_3\",\"video\":{\"mimes\":
+[\"video/3gpp\",\"video/mp4\",\"video/webm\"],\"minduration\":30,\"maxduration\":35,\"protocols\":
+[2,3,5,6,7,8],\"w\":320,\"h\":480,\"startdelay\":2,\"placement\":5,\"linearity\":1,\"skip\":1,\"skipmin\":10,\"skipafter\":15,\"seque
+[6,7],\"minbitrate\":1200,\"maxbitrate\":1999,\"boxingallowed\":1,\"playbackmethod\":
+[1],\"playbackend\":1,\"delivery\":[2],\"pos\":7,\"api\":[1,2],\"companiontype\":[1,2,3]},\"pmp\":
+{\"private_auction\":1,\"deals\":[{\"id\":\"123\",\"bidfloor\":1.2,\"bidfloorcur\":\"USD\",\"at\":1,\"wseat\":
+[\"IAB-1\",\"IAB-2\"],\"wadomain\":
+[\"WD1\",\"WD2\"]}]},\"displaymanager\":\"PubMaticSDK\",\"displaymanagerver\":\"PubMaticSDK-
+1.0\",\"instl\":1,\"tagid\":\"47samurai_0x0_OW_CTV\",\"bidfloor\":1.1,\"bidfloorcur\":\"USD\",\"secure\":0,\"iframebuster\":
+[\"1\"],\"exp\":1},{\"id\":\"28635736ddc2bb1_4\",\"video\":{\"mimes\":
+[\"video/3gpp\",\"video/mp4\",\"video/webm\"],\"minduration\":30,\"maxduration\":35,\"protocols\":
+[2,3,5,6,7,8],\"w\":320,\"h\":480,\"startdelay\":2,\"placement\":5,\"linearity\":1,\"skip\":1,\"skipmin\":10,\"skipafter\":15,\"seque
+[6,7],\"minbitrate\":1200,\"maxbitrate\":1999,\"boxingallowed\":1,\"playbackmethod\":
+[1],\"playbackend\":1,\"delivery\":[2],\"pos\":7,\"api\":[1,2],\"companiontype\":[1,2,3]},\"pmp\":
+{\"private_auction\":1,\"deals\":[{\"id\":\"123\",\"bidfloor\":1.2,\"bidfloorcur\":\"USD\",\"at\":1,\"wseat\":
+[\"IAB-1\",\"IAB-2\"],\"wadomain\":
+[\"WD1\",\"WD2\"]}]},\"displaymanager\":\"PubMaticSDK\",\"displaymanagerver\":\"PubMaticSDK-
+1.0\",\"instl\":1,\"tagid\":\"47samurai_0x0_OW_CTV\",\"bidfloor\":1.1,\"bidfloorcur\":\"USD\",\"secure\":0,\"iframebuster\":
+[\"1\"],\"exp\":1}],\"site\":{\"id\":\"123\",\"name\":\"EbayShopping\",\"domain\":\"ebay.com\",\"cat\":
+[\"IAB1-5\"],\"sectioncat\":[\"IAB1-5\"],\"pagecat\":[\"IAB1-
+5\"],\"page\":\"http://ebay.com/inte/automation/s2s/pwt_parameter_validation_muti_slot_multi_size.html?
+videobid=5\",\"ref\":\"http://ebay.com/home\",\"search\":\"NewCloths\",\"mobile\":1,\"privacypolicy\":1,\"publisher\":
+{\"id\":\"159396\",\"name\":\"Test Publisher\",\"cat\":[\"IAB1-5\"],\"domain\":\"publisher.com\"},\"content\":
+{\"id\":\"381d2e0b-548d-4f27-bfdd-
+e6e66f43557e\",\"episode\":1,\"title\":\"StarWars\",\"series\":\"StarWars\",\"season\":\"Season3\",\"artist\":\"GeorgeLucas\",\"genre
+{\"id\":\"123\",\"name\":\"GaryKurtz\",\"cat\":[\"IAB1-5\",\"IAB1-
+6\"],\"domain\":\"producer.com\"},\"url\":\"http://www.pubmatic.com/test/\",\"cat\":[\"IAB1-1\",\"IAB1-
+2\"],\"prodq\":1,\"videoquality\":1,\"context\":1,\"contentrating\":\"MPAA\",\"userrating\":\"9-
+Stars\",\"qagmediarating\":1,\"keywords\":\"ActionMovies\",\"livestream\":1,\"sourcerelationship\":1,\"len\":12000,\"language\":\"en-
+US\",\"embeddable\":1},\"keywords\":\"Cloths\",\"ext\":{\"amp\":0}},\"device\":{\"ua\":\"Mozilla/5.0 (Windows
+NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36\",\"geo\":
+{\"lat\":72.6,\"lon\":72.6,\"type\":1,\"accuracy\":10,\"ipservice\":1,\"country\":\"Ind\",\"region\":\"Maharashtra\",\"regionfips104\
+X\",\"os\":\"iOS\",\"osv\":\"10\",\"hwv\":\"10x\",\"h\":768,\"w\":1366,\"ppi\":4096,\"pxratio\":1.3,\"js\":1,\"flashver\":\"1.1\",\"l
+US\",\"carrier\":\"VERIZON\",\"mccmnc\":\"310-005\",\"connectiontype\":2},\"user\":
+{\"yob\":1990,\"gender\":\"M\",\"keywords\":\"Movies\",\"customdata\":\"StarWars\",\"geo\":
+{\"lat\":72.6,\"lon\":72.6,\"type\":1,\"accuracy\":10,\"ipservice\":1,\"country\":\"India\",\"region\":\"Maharashtra\",\"regionfips10
+[{\"id\":\"StarWars\",\"name\":\"StarWars\",\"ext\":{}}],\"ext\":
+{\"consent\":\"BOEFEAyOEFEAyAHABDENAI4AAAB9vABAASA\"}},\"at\":1,\"tmax\":989,\"wseat\":
+[\"nike\",\"puma\",\"reebok\"],\"allimps\":1,\"cur\":[\"USD\"],\"bcat\":[\"IAB1-1\",\"IAB1-2\"],\"badv\":
+[\"ford.com\"],\"bapp\":[\"com.foo.mygame\"],\"source\":{\"tid\":\"1559039248176\"},\"regs\":{\"ext\":
+{\"gdpr\":1,\"us_privacy\":\"1YNN\"}},\"ext\":{\"wrapper\":{\"version\":1,\"profile\":2375}}}" 	,
+"responsebody":
+Source object
+OpenWrap Key 	ORTB 2.5 Key
+src.[param] 	bidrequest.source.[param]
+Impression object
+OpenWrap Key 	ORTB 2.5 Key
+imp.[param] 	bidrequest.imp[0].[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	14/43
+
+-- 14 of 43 --
+
+OpenWrap Key 	Type 	Description 	Example
+displaymanagerver 	String 	A version of ad mediation partner, SDK
+technology, or player responsible for
+rendering ad (typically video or mobile).
+Used by some ad servers to customize ad
+code by a partner. Recommended for video
+and/or apps.
+PubMaticSDK-1.0
+instl 	Integer
+Default:
+0
+0 = ad is not interstitial.
+1 = ad is interstitial or full screen.
+1
+bidfloor 	Float 	The minimum bid for this impression
+expressed in CPM.
+1.1
+bidfloorcur 	String 	Currency specified using ISO-4217 alpha
+codes.
+This may be different from bid currency
+returned by the bidder if this is allowed by
+the exchange.
+USD
+clickbrowser 	Integer 	Indicates the type of browser opened upon
+clicking the creative in an app.
+0 = embedded
+1 = native
+Note that the Safari View Controller in iOS
+9.x devices is considered a native browser
+for purposes of this attribute.
+0
+secure 	Integer 	Flag to indicate if the impression requires
+secure HTTPS URL creative assets and
+markup.
+0 = non-secure
+1 = secure
+If omitted, the secure state is unknown, but
+non-secure HTTP support can be assumed.
+1
+iframebuster 	String
+Array
+An array of exchange-specific names of
+supported iframe busters.
+1
+exp 	Integer 	Advisory as to the number of seconds that
+may elapse between the auction and the
+actual impression
+1
+pmp 	String 	An oRTB 2.5 PMP object containing
+configuration JSON for any private
+marketplace deals active for the impression.
+Sample PMP Object JSON Expand source
+{
+"private_auction": 1,
+"deals": [{
+"id": "123",
+%7B%22private_auction%22%3A1%2C%22deals%22%3A%5B
+%7B%22id%22%3A%22123%22%2C%22bidfloor%22%3A1.2%2C
+%22bidfloorcur%22%3A%22USD%22%2C%22at%22%3A1%2C
+%22wseat%22%3A%5B%22IAB-1%22%2C%22IAB-
+2%22%5D%2C
+%22wadomain%22%3A%5B%22WD1%22%2C%22WD2%22%5D
+%7D%5D%7D
+"{\"id\":\"1559039248176\",\"seatbid\":[{\"bid\":[{\"id\":\"VIDEO12-89A1-41F1-8708-
+978FD3C0912A\",\"impid\":\"28635736ddc2bb1_1\",\"price\":5,\"adm\":\"<VAST version='3.0'><Ad id='601364'>
+<InLine><AdSystem>Acudeo Compatible</AdSystem><AdTitle>VAST 2.0 Instream Test 1</AdTitle><Description>VAST 2.0
+Instream Test 1</Description><Impression><![CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-
+qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ41&imprId=48F73E1A-7F23-443D-
+A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]></Impression>
+<Impression>https://dsptracker.com/{PSPM}</Impression><Error><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]></Error><Creatives><Creative AdID='601364'><Linear
+skipoffset='70%'><TrackingEvents><Tracking event='close'><![CDATA[https://mytracking.com/linear/close]]>
+</Tracking><Tracking event='skip'><![CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking
+event='creativeView'><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event='start'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]></Tracking><Tracking event='midpoint'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]></Tracking><Tracking event='firstQuartile'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]></Tracking><Tracking event='thirdQuartile'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]></Tracking><Tracking event='complete'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]></Tracking></TrackingEvents><Duration>00:00:04</Duration>
+<VideoClicks><ClickTracking><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]></ClickTracking>
+<ClickThrough>https://www.pubmatic.com</ClickThrough></VideoClicks><MediaFiles><MediaFile
+delivery='progressive' type='video/mp4' bitrate='500' width='400' height='300' scalable='true'
+maintainAspectRatio='true'><![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile></MediaFiles></Linear></Creative></Creatives></InLine></Ad></VAST>\",\"adomain\":
+[\"ae.com\"],\"cid\":\"17050\",\"crid\":\"creative-1_1_2\",\"dealid\":\"PUBDEAL1\",\"ext\":{\"dspid\":6}},
+{\"id\":\"VIDEO12-89A1-41F1-8708-978FD3C0912A\",\"impid\":\"28635736ddc2bb1_2\",\"price\":5,\"adm\":\"<VAST
+version='3.0'><Ad id='601364'><InLine><AdSystem>Acudeo Compatible</AdSystem><AdTitle>VAST 2.0 Instream Test
+1</AdTitle><Description>VAST 2.0 Instream Test 1</Description><Impression><!
+[CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-
+qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ41&imprId=48F73E1A-7F23-443D-
+A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]></Impression>
+<Impression>https://dsptracker.com/{PSPM}</Impression><Error><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]></Error><Creatives><Creative AdID='601364'><Linear
+skipoffset='70%'><TrackingEvents><Tracking event='close'><![CDATA[https://mytracking.com/linear/close]]>
+</Tracking><Tracking event='skip'><![CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking
+event='creativeView'><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event='start'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]></Tracking><Tracking event='midpoint'><!
+[CDATA[htt 	//172 16 4 213/t 	k?
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	15/43
+
+-- 15 of 43 --
+
+OpenWrap Key 	Type 	Description 	Example
+"bidfloor": 1.2,
+"bidfloorcur": "USD",
+"at": 1,
+"wseat": ["IAB-1", "IAB-2"],
+"wadomain": ["WD1", "WD2"]
+}]
+}
+Server-side OpenWrap…
+Forwards the PMP object unchanged to the
+Prebid Server.
+The Impression object supports ad pods.
+The PMP object is a parameter object of the Imp object. PMP objects in turn may encapsulate Deal and Extension objects, as described below.
+Parameter 	Type 	Description 	Example
+private_auction 	Integer
+Default: 0
+Indicator of auction eligibility to seats named in the Direct Deals object
+0 = all bids are accepted
+1 = bids are restricted to the deals specified and the terms thereof.
+1
+deals 	Object Array 	Array of Deal objects that convey the specific deals applicable to an impression 	See Deals section below.
+ext 	Object 	Placeholder for exchange-specific extensions to OpenRTB. 	See Ext section below.
+The Deal object contains configuration details for Deals belonging to the current Imp, and are encapsulated by a PMP object.
+Parameter 	Type 	Description 	Example
+id 	String:
+Required
+A unique identifier for the direct deal. 	1234
+bidfloor 	Float
+Default: 0
+Minimum bid for this impression expressed in CPM. 	1.2
+bidfloorcur 	String
+Default:
+USD
+Currency specified using ISO-4217 alpha codes. This may be different from bid currency returned
+by bidder if this is allowed by the exchange.
+USD
+at 	Integer 	Optional override of the overall auction type of the bid request
+1 = First Price
+2 = Second Price Plus
+3 = the value passed in bidfloor is the agreed upon deal price.
+Additional auction types can be defined by the exchange.
+1
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]></Tracking><Tracking event='firstQuartile'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]></Tracking><Tracking event='thirdQuartile'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]></Tracking><Tracking event='complete'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]></Tracking></TrackingEvents><Duration>00:00:04</Duration>
+<VideoClicks><ClickTracking><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]></ClickTracking>
+<ClickThrough>https://www.pubmatic.com</ClickThrough></VideoClicks><MediaFiles><MediaFile
+delivery='progressive' type='video/mp4' bitrate='500' width='400' height='300' scalable='true'
+maintainAspectRatio='true'><![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile></MediaFiles></Linear></Creative></Creatives></InLine></Ad></VAST>\",\"adomain\":
+[\"ae.com\"],\"cid\":\"17050\",\"crid\":\"creative-1_1_2\",\"dealid\":\"PUBDEAL1\",\"ext\":{\"dspid\":6}},
+{\"id\":\"VIDEO12-89A1-41F1-8708-978FD3C0912A\",\"impid\":\"28635736ddc2bb1_3\",\"price\":5,\"adm\":\"<VAST
+version='3.0'><Ad id='601364'><InLine><AdSystem>Acudeo Compatible</AdSystem><AdTitle>VAST 2.0 Instream Test
+1</AdTitle><Description>VAST 2.0 Instream Test 1</Description><Impression><!
+[CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-
+qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ41&imprId=48F73E1A-7F23-443D-
+A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]></Impression>
+<Impression>https://dsptracker.com/{PSPM}</Impression><Error><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]></Error><Creatives><Creative AdID='601364'><Linear
+skipoffset='70%'><TrackingEvents><Tracking event='close'><![CDATA[https://mytracking.com/linear/close]]>
+</Tracking><Tracking event='skip'><![CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking
+event='creativeView'><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event='start'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]></Tracking><Tracking event='midpoint'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]></Tracking><Tracking event='firstQuartile'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]></Tracking><Tracking event='thirdQuartile'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]></Tracking><Tracking event='complete'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]></Tracking></TrackingEvents><Duration>00:00:04</Duration>
+<VideoClicks><ClickTracking><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]></ClickTracking>
+<ClickThrough>https://www.pubmatic.com</ClickThrough></VideoClicks><MediaFiles><MediaFile
+delivery='progressive' type='video/mp4' bitrate='500' width='400' height='300' scalable='true'
+maintainAspectRatio='true'><![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile></MediaFiles></Linear></Creative></Creatives></InLine></Ad></VAST>\",\"adomain\":
+[\"ae.com\"],\"cid\":\"17050\",\"crid\":\"creative-1_1_2\",\"dealid\":\"PUBDEAL1\",\"ext\":{\"dspid\":6}},
+{\"id\":\"VIDEO12-89A1-41F1-8708-978FD3C0912A\" \"impid\":\"28635736ddc2bb1 4\" \"price\":5 \"adm\":\"<VAST
+PMP object
+Deal object
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	16/43
+
+-- 16 of 43 --
+
+Parameter 	Type 	Description 	Example
+wseat 	String
+Array
+Allowlist of buyer seats (for example, advertisers, agencies) allowed to bid on this deal.
+IDs of seats and the buyerʼs customers to which they refer must be coordinated between bidders
+and the exchange a priori.
+Omission implies no seat restrictions.
+nike,puma
+wadomain 	String
+Array
+Array of advertiser domains (for example, advertiser.com) allowed to bid on this deal.
+Omission implies no advertiser restrictions.
+ad.com,page.com
+ext 	Object 	Placeholder for exchange-specific extensions to OpenRTB. 	See Ext section
+below.
+The Video object is a child of the Impression object, described above. The next table shows the OpenWrap key to reference Vid objects, and for
+comparison, the equivalent OpenRTB 2.5 key to reference Video objects.
+The following table lists the parameters available to let you configure Vid objects.
+Parameter 	Type 	Description 	Example
+minduration 	Integer 	Minimum video duration of ad (or ad pod) in seconds. 	5
+maxduration 	Integer 	Maximum video duration of ad (or ad pod) in seconds . 	120
+protocols 	Integer
+Array
+Array of supported video protocols.
+Specify at least one supported protocol in either the protocol or protocols attribute.
+2,3,5,6,7,8
+w 	Integer 	Width of the video player in device independent pixels (DIPS). 	320
+h 	Integer 	Height of the video player in device independent pixels (DIPS). 	480
+startdelay 	Integer 	Indicates the start delay in seconds for pre, mid, or post-roll ad placements. 	0
+placement 	Integer 	Placement type for the impression. 	5
+plcmt 	integer 	Placement type for the impression. 	1
+linearity 	Integer 	Determines whether the impression is linear, nonlinear, and so on. Leaving unspecified implies all are
+allowed.
+1
+skip 	Integer 	Determines whether the user can skip the video ad.
+0 = No
+1 = Yes
+If a bidder sends markup/creative that is skippable, the Bid object must include the attr array with an
+element of 16 to flag that the video is skippable.
+1
+skipmin 	Integer 	Videos of total duration greater than this number of seconds can be skippable; only applicable if the ad
+is skippable.
+1
+skipafter 	Integer 	Number of seconds a video must play before skipping is enabled; only applicable if the ad is skippable. 	1
+sequence 	Integer 	If the BidRequest offers multiple ad impressions, the sequence number facilitates coordinated delivery of
+multiple creatives.
+1
+battr 	Integer
+Array
+Blocked creative attributes. 	1,2,3
+{\ id\ :\ VIDEO12-89A1-41F1-8708-978FD3C0912A\ ,\ impid\ :\ 28635736ddc2bb1_4\ ,\ price\ :5,\ adm\ :\ <VAST
+version='3.0'><Ad id='601364'><InLine><AdSystem>Acudeo Compatible</AdSystem><AdTitle>VAST 2.0 Instream Test
+1</AdTitle><Description>VAST 2.0 Instream Test 1</Description><Impression><!
+[CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-
+qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ41&imprId=48F73E1A-7F23-443D-
+A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]></Impression>
+<Impression>https://dsptracker.com/{PSPM}</Impression><Error><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]></Error><Creatives><Creative AdID='601364'><Linear
+skipoffset='70%'><TrackingEvents><Tracking event='close'><![CDATA[https://mytracking.com/linear/close]]>
+</Tracking><Tracking event='skip'><![CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking
+event='creativeView'><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event='start'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]></Tracking><Tracking event='midpoint'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]></Tracking><Tracking event='firstQuartile'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]></Tracking><Tracking event='thirdQuartile'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]></Tracking><Tracking event='complete'><!
+[CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]></Tracking></TrackingEvents><Duration>00:00:04</Duration>
+<VideoClicks><ClickTracking><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]></ClickTracking>
+<ClickThrough>https://www.pubmatic.com</ClickThrough></VideoClicks><MediaFiles><MediaFile
+delivery='progressive' type='video/mp4' bitrate='500' width='400' height='300' scalable='true'
+maintainAspectRatio='true'><![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile></MediaFiles></Linear></Creative></Creatives></InLine></Ad></VAST>\",\"adomain\":
+[\"ae.com\"],\"cid\":\"17050\",\"crid\":\"creative-1_1_2\",\"dealid\":\"PUBDEAL1\",\"ext\":
+{\"dspid\":6}}],\"seat\":\"4098\"}],\"cur\":\"USD\"}" 	,
+"status": 200,
+"uri": "http://10.110.194.12:3141/translator?source=pubmatic-server"
+}
+]
+},
+"resolvedrequest": {
+"allimps": 1,
+"at": 1,
+"badv": [
+"ford.com"
+],
+"bapp": [
+"com.foo.mygame"
+],
+"bcat": [
+"IAB1-1",
+"IAB1-2"
+],
+"cur": [
+"USD"
+],
+"device": {
+"carrier": "VERIZON",
+"connectiontype": 2,
+Video object
+OpenWrap Key 	ORTB 2.5 Key
+imp.vid.[param] 	bidrequest.imp[0].video.[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	17/43
+
+-- 17 of 43 --
+
+Parameter 	Type 	Description 	Example
+maxextended 	Integer 	Maximum extended ad duration, if allowed.
+blank/0 = extension is not allowed.
+-1 = extension allowed, without time limit.
+1 or greater = represents the number of seconds playback extends beyond maxduration.
+10
+minbitrate 	Integer 	Minimum bit rate in Kbps. 	1200
+maxbitrate 	Integer 	Maximum bit rate in Kbps. 	2000
+boxingallowed 	Integer 	Determines whether 4:3 content is letter-boxed into 16:9 aspect ratio.
+0 = No.
+1 = Yes.
+1
+playbackmethod 	Integer
+Array
+Playback methods that may be in use. Unspecified implies that any method is possible.
+Typically only one method ever used. As a result, a future version of the specification may define this
+parameter as an integer. The best practice is to use only the first element of this array in preparation for
+this change.
+1
+delivery 	Integer
+Array
+Supported delivery methods; for example, streaming, progressive. Unspecified implies that all are
+supported.
+2
+pos 	Integer 	Ad position on screen. 	7
+api 	Integer
+Array
+List of supported API frameworks for this impression. Unlisted APIs equal unsupported. 	2
+The Site object is a child of BidRequest described above. The next table shows the OpenWrap key to reference Site objects, and for comparison, the
+equivalent OpenRTB 2.5 key to reference Site objects.
+The following table lists the parameters available to let you configure Site objects.
+Parameter 	Type 	Description 	Example
+id 	String 	Exchange-specific site ID 	123
+name 	String 	Site name (may be aliasedat the publisherʼs request). 	EbayShopping
+domain 	String 	Domain of the site (for example, “mysite.foo.com”). 	ebay.com
+cat 	String
+Array
+Array of IAB content categories of the site. 	IAB1-5
+sectioncat 	String
+Array
+Array of IAB content categories that describe the current section of the site. 	IAB1-5
+pagecat 	String
+Array
+Array of IAB content categories that describe the current page or view of the
+site.
+IAB1-5
+page 	String 	URL of the page where the impression will be shown. 	http%3A%2F%2Febay.com%2Fhome
+ref 	String 	Referrer URL that caused navigation to the current page. 	http%3A%2F%2Febay.com%2Fhome
+search 	String 	Search string that caused navigation to the current page. 	NewCloths
+"devicetype": 1,
+"didmd5": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"didsha1": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"dnt": 0,
+"dpidmd5": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"dpidsha1": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"flashver": "1.1",
+"geo": {
+"accuracy": 10,
+"city": "Mumbai",
+"country": "Ind",
+"ipservice": 1,
+"lat": 72.6,
+"lon": 72.6,
+"metro": "Mumbai",
+"region": "Maharashtra",
+"regionfips104": "MAHA",
+"type": 1,
+"utcoffset": 120,
+"zip": "123456"
+},
+"h": 768,
+"hwv": "10x",
+"ifa": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"ip": "172.16.8.74",
+"ipv6": "2001:db8::8a2e:370:7334",
+"js": 1,
+"language": "en-US",
+"lmt": 1,
+"macmd5": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"macsha1": "EA7583CD-A667-48BC-B806-42ECB2B48606",
+"make": "Apple",
+"mccmnc": "310-005",
+"model": "iPhone X",
+"os": "iOS",
+"osv": "10",
+"ppi": 4096,
+"pxratio": 1.3,
+"ua":
+"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169
+Safari/537.36" 	,
+"w": 1366
+},
+"ext": {
+"prebid": {
+"aliases": {
+"adg": "adgeneration",
+"districtm": "appnexus",
+"districtmDMX": "dmx"
+},
+"debug": 1,
+"targeting": {
+"durationrangesec": null,
+"includebidderkeys": true,
+"includebrandcategory": null,
+"includewinners": true,
+"pricegranularity": {
+"precision": 2,
+"ranges": [
+{
+"increment": 0.05,
+"max": 5,
+"min": 0
+},
+{
+"increment": 0.1,
+"max": 10,
+"min": 5
+},
+{
+"increment": 0.5,
+"max": 20,
+"min": 10
+}
+]
+Site object
+OpenWrap Key 	ORTB 2.5 Key
+site.[param] 	bidrequest.site.[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	18/43
+
+-- 18 of 43 --
+
+Parameter 	Type 	Description 	Example
+mobile 	Integer 	Indicates if the site has been programmed to optimize layout when viewed
+on mobile devices, where 0 = no, 1 = yes.
+1
+privacypolicy 	Integer 	Indicates if the site has a privacy policy.
+0 = No
+1 = Yes.
+1
+keywords 	String 	Comma separated list of keywords about the site . 	Clothes
+cnt.net.id 	String 	Content Network Id
+cnt.net.name 	String 	Content Network Name
+cnt.net.domain 	String 	Content Network Domain
+cnt.chan.id 	String 	Content Channel Id
+cnt.chan.name 	String 	Content Channel Name
+cnt.chan.domain 	String 	Content Channel Domain
+The Site object can also contain the following parameter objects:
+The App object is a child of BidRequest described above. The next table shows the OpenWrap key to reference App objects, and for comparison, the
+equivalent OpenRTB 2.5 key to reference App objects.
+The following table lists the parameters available to let you configure App objects.
+OpenWrap Key 	Type 	Description 	Example
+id 	String 	Exchange-specific app ID. 	1234
+name 	String 	App name (may be aliasedat the publisherʼs
+request).
+MyFooGame
+bundle 	String 	A platform-specific application identifierintended to
+be unique to the app and independent of the
+exchange.
+On Android, this should be a bundle or package
+name (for example, com.foo.mygame).
+On iOS, it is typically a numeric ID
+com.foo.mygame
+domain 	String 	Domainof the app (for example,
+“mygame.foo.com”)
+mygame.foo.com
+storeurl 	String 	App store URL for an installed app; for IQG2.1
+compliance.
+https://play.google.com/store/apps/details?
+id=com.foo.mygame
+cat 	String
+Array
+Array of IAB content categories of the app. 	IAB1-5,IAB1-6
+}
+}
+}
+},
+"id": "1559039248176",
+"imp": [
+{
+"bidfloor": 1.1,
+"bidfloorcur": "USD",
+"displaymanager": "PubMaticSDK",
+"displaymanagerver": "PubMaticSDK-1.0",
+"exp": 1,
+"ext": {
+"pubmatic": {
+"adSlot": "47samurai_0x0_OW_CTV@0x0",
+"publisherId": "159396",
+"wrapper": {
+"profile": 2375,
+"version": 1
+}
+}
+},
+"id": "28635736ddc2bb1_1",
+"iframebuster": [
+"1"
+],
+"instl": 1,
+"pmp": {
+"deals": [
+{
+"at": 1,
+"bidfloor": 1.2,
+"bidfloorcur": "USD",
+"id": "123",
+"wadomain": [
+"WD1",
+"WD2"
+],
+"wseat": [
+"IAB-1",
+"IAB-2"
+]
+}
+],
+"private_auction": 1
+},
+"secure": 0,
+"tagid": "47samurai_0x0_OW_CTV",
+"video": {
+"api": [
+1,
+2
+],
+"battr": [
+6,
+7
+],
+"boxingallowed": 1,
+"companiontype": [
+1,
+2,
+3
+],
+"delivery": [
+2
+],
+"h": 480,
+"linearity": 1,
+"maxbitrate": 1999,
+"maxduration": 35,
+"mimes": [
+"video/3gpp",
+"video/mp4",
+"video/webm"
+],
+Object 	OpenWrap Key 	ORTB 2.5 Key
+Content 	site.cnt.[param] 	bidrequest.site.content.[param]
+Publisher 	site.pub.[param] 	bidrequest.site.publisher.[param]
+App object
+OpenWrap Key 	ORTB 2.5 Key
+app.[param] 	bidrequest.app.[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	19/43
+
+-- 19 of 43 --
+
+OpenWrap Key 	Type 	Description 	Example
+sectioncat 	String
+Array
+Array of IAB content categories that describe the
+current section of the app.
+IAB1-5
+pagecat 	String
+Array
+Array of IAB content categories that describe the
+current page or view of the app.
+IAB1-5
+ver 	String 	Application version. 	1.1
+privacypolicy 	Integer 	Indicates the app has a privacy policy.
+0 = No
+1 = Yes
+1
+paid 	Integer 	0 = app is free
+1 = the app is a paid version
+1
+keywords 	String 	Comma separated list of keywords about the app. 	Games
+app.ext.inventorypartnerdomain 	String 	A domain to be used for inventory authorization in
+the case of inventory sharing arrangements
+between an app owner and content owner.
+"programmerA.com”
+cnt.net.id 	String 	Content Network ID
+cnt.net.name 	String 	Content Network Name
+cnt.net.domain 	String 	Content Network Domain
+cnt.chan.id 	String 	Content Channel Id
+cnt.chan.name 	String 	Content Channel Name
+cnt.chan.domain 	String 	Content Channel Domain
+The App object can also contain the following parameter objects:
+The Publisher object is a child of the Site and App objects, described above. The next table shows the OpenWrap keys to reference Pub objects, and
+for comparison, the equivalent OpenRTB 2.5 keys to reference Publisher objects.
+The following table lists the parameters available to let you configure Pub objects.
+"minbitrate": 1200,
+"minduration": 30,
+"placement": 5,
+"playbackend": 1,
+"playbackmethod": [
+1
+],
+"pos": 7,
+"protocols": [
+2,
+3,
+5,
+6,
+7,
+8
+],
+"sequence": 1,
+"skip": 1,
+"skipafter": 15,
+"skipmin": 10,
+"startdelay": 2,
+"w": 320
+}
+},
+{
+"bidfloor": 1.1,
+"bidfloorcur": "USD",
+"displaymanager": "PubMaticSDK",
+"displaymanagerver": "PubMaticSDK-1.0",
+"exp": 1,
+"ext": {
+"pubmatic": {
+"adSlot": "47samurai_0x0_OW_CTV@0x0",
+"publisherId": "159396",
+"wrapper": {
+"profile": 2375,
+"version": 1
+}
+}
+},
+"id": "28635736ddc2bb1_2",
+"iframebuster": [
+"1"
+],
+"instl": 1,
+"pmp": {
+"deals": [
+{
+"at": 1,
+"bidfloor": 1.2,
+"bidfloorcur": "USD",
+"id": "123",
+"wadomain": [
+"WD1",
+"WD2"
+],
+"wseat": [
+"IAB-1",
+"IAB-2"
+]
+}
+],
+"private_auction": 1
+},
+"secure": 0,
+"tagid": "47samurai_0x0_OW_CTV",
+"video": {
+"api": [
+1,
+2
+],
+"battr": [
+6,
+7
+],
+Object 	OpenWrap Key 	ORTB 2.5 Key
+Content 	app.cnt.[param] 	bidrequest.app.content.[param]
+Publisher 	app.pub.[param] 	bidrequest.app.publisher.[param]
+Publisher object
+OpenWrap Key 	ORTB 2.5 Key
+app.pub.[param] 	bidrequest.app.publisher.[param]
+site.pub.[param] 	bidrequest.site.publisher.[param]
+Parameter 	Type 	Description 	Example
+id 	String 	Exchange-specific publisher ID. 	5890
+name 	String 	Publisher name (may be aliased at the publisherʼs request). 	TestPublisher
+cat 	String Array 	Array of IAB content categories that describe the publisher. 	IAB1-5
+domain 	String 	Highest level domain of the publisher; for example, “publisher.com”). 	publisher.com
+Content object
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	20/43
+
+-- 20 of 43 --
+
+The Content object is a child of the Site and App objects, described above. The next table shows the OpenWrap keys to reference Cnt objects, and for
+comparison, the equivalent OpenRTB 2.5 keys to reference Content objects.
+The following table lists the parameters available to let you configure Content objects.
+Parameter 	Type 	Description 	Example
+id 	String 	ID uniquely identifying the content. 	381d2e0b-548d-4f27-bfdd-
+e6e66f43557e
+episode 	Integer 	Episode number. 	1
+title 	String 	Content title.
+Video Examples: “Search Committee” (television), “A New Hope” (movie),
+or “Endgame” (made for web).
+Non-Video Example: “Why an Antarctic Glacier Is Melting So Quickly”
+(Time magazine article)
+StarWars
+series 	String 	Content series.
+Video Examples: “The Office” (television), “Star Wars” (movie), or “Arby
+‘Nʼ The Chief” (made for web).
+Non-Video Example: “Ecocentric” (Time Magazine blog).
+StarWars
+season 	String 	Content season (for example, “Season 3”). 	Season3
+artist 	String 	Artist credited with the content. 	GeorgeLucas
+genre 	String 	Genre that best describes the content (for example, rock, pop, etc). 	Action
+album 	String 	Album to which the content belongs; typically for audio. 	Action
+isrc 	String 	International Standard Recording Code conforming to ISO-3901. 	2
+url 	String 	URL of the content, for buy-side contextualization or review. 	http://www.pubmatic.com/test/
+cat 	String
+Array
+Array of IAB content categories that describe the content producer. 	IAB1-1,IAB1-2
+prodq 	Integer 	Production quality 	1
+context 	Integer 	Type of content (game, video, text, etc.). 	1
+contentrating 	String 	Content rating (for example, MPAA). 	MPAA
+userrating 	String 	User rating of the content (for example, number of stars, likes, etc.). 	9-Stars
+qagmediarating 	Integer 	Media rating per IQG guidelines 	1
+keywords 	String 	Comma separated list of keywords describing the content. 	ActionMovies
+livestream 	Integer 	0 = Not Live
+1 = Content is Live (for example, stream, live blog).
+1
+sourcerelationship 	Integer 	0 = Indirect
+1 = Direct.
+1
+len 	Integer 	Length of content in seconds; appropriate for video or audio. 	12000
+language 	String 	Content language using ISO-639-1-alpha-2. 	en-US
+"boxingallowed": 1,
+"companiontype": [
+1,
+2,
+3
+],
+"delivery": [
+2
+],
+"h": 480,
+"linearity": 1,
+"maxbitrate": 1999,
+"maxduration": 35,
+"mimes": [
+"video/3gpp",
+"video/mp4",
+"video/webm"
+],
+"minbitrate": 1200,
+"minduration": 30,
+"placement": 5,
+"playbackend": 1,
+"playbackmethod": [
+1
+],
+"pos": 7,
+"protocols": [
+2,
+3,
+5,
+6,
+7,
+8
+],
+"sequence": 2,
+"skip": 1,
+"skipafter": 15,
+"skipmin": 10,
+"startdelay": 2,
+"w": 320
+}
+},
+{
+"bidfloor": 1.1,
+"bidfloorcur": "USD",
+"displaymanager": "PubMaticSDK",
+"displaymanagerver": "PubMaticSDK-1.0",
+"exp": 1,
+"ext": {
+"pubmatic": {
+"adSlot": "47samurai_0x0_OW_CTV@0x0",
+"publisherId": "159396",
+"wrapper": {
+"profile": 2375,
+"version": 1
+}
+}
+},
+"id": "28635736ddc2bb1_3",
+"iframebuster": [
+"1"
+],
+"instl": 1,
+"pmp": {
+"deals": [
+{
+"at": 1,
+"bidfloor": 1.2,
+"bidfloorcur": "USD",
+"id": "123",
+"wadomain": [
+"WD1",
+"WD2"
+],
+"wseat": [
+OpenWrap Key 	ORTB 2.5 Key
+app.cnt.[param] 	bidrequest.app.content.[param]
+site.cnt.[param] 	bidrequest.site.content.[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	21/43
+
+-- 21 of 43 --
+
+Parameter 	Type 	Description 	Example
+embeddable 	Integer 	Indicator of whether or not the content is embeddable (for example, an
+embeddable video player).
+0 = No
+1 = Yes
+1
+The Content object can also contain the Producer parameter object.
+The Producer object is a parameter object for the Content, described above. The next table shows the OpenWrap keys to reference Prod objects from
+App and Site contexts, and for comparison, the equivalent OpenRTB 2.5 keys.
+The following table lists the parameters available to let you configure Prod objects.
+The Device object is a child of BidRequest described above. The next table shows the OpenWrap key to reference Dev objects, and for comparison,
+the equivalent OpenRTB 2.5 key to reference Device objects.
+The following table lists the parameters available to let you configure Device objects.
+Parameter 	Type 	Description 	Example
+ua 	String 	Browser user agent string.
+It can be derived from User-
+Agent header if not specified.
+Mozilla%2F5. 0%20
+(Windows%20NT%206.
+1%3B%20Win64%3B%20x64%3B%20rv%3A47.0)
+%20Gecko%2F20100101%20Firefox%2F47.0
+dnt 	Integer 	Standard “DoNotTrack” flag
+as set in the header by the
+browser.
+0 = Tracking is unrestricted
+1 = Do Not Track.
+Note: Consult each bidderʼs
+documentation to understand
+how they process this field.
+1
+lmt 	Integer 	“Limit Ad Tracking” signal
+commercially endorsed (for
+example, iOS, Android)
+1
+"IAB-1",
+"IAB-2"
+]
+}
+],
+"private_auction": 1
+},
+"secure": 0,
+"tagid": "47samurai_0x0_OW_CTV",
+"video": {
+"api": [
+1,
+2
+],
+"battr": [
+6,
+7
+],
+"boxingallowed": 1,
+"companiontype": [
+1,
+2,
+3
+],
+"delivery": [
+2
+],
+"h": 480,
+"linearity": 1,
+"maxbitrate": 1999,
+"maxduration": 35,
+"mimes": [
+"video/3gpp",
+"video/mp4",
+"video/webm"
+],
+"minbitrate": 1200,
+"minduration": 30,
+"placement": 5,
+"playbackend": 1,
+"playbackmethod": [
+1
+],
+"pos": 7,
+"protocols": [
+2,
+3,
+5,
+6,
+7,
+8
+],
+"sequence": 3,
+"skip": 1,
+"skipafter": 15,
+"skipmin": 10,
+"startdelay": 2,
+"w": 320
+}
+},
+{
+"bidfloor": 1.1,
+"bidfloorcur": "USD",
+"displaymanager": "PubMaticSDK",
+"displaymanagerver": "PubMaticSDK-1.0",
+"exp": 1,
+"ext": {
+"pubmatic": {
+"adSlot": "47samurai_0x0_OW_CTV@0x0",
+"publisherId": "159396",
+"wrapper": {
+"profile": 2375,
+"version": 1
+}
+}
+Producer object
+OpenWrap Keys 	ORTB 2.5 Keys
+app.cnt.prod.[param] 	bidrequest.app.content.producer.[param]
+site.cnt.prod.[param] 	bidrequest.site.content.producer.[param]
+Parameter 	Type 	Description 	Example
+id 	String 	Content producer or originator ID. Useful if content is syndicated and may be posted on a site using
+embed tags
+Prod123
+name 	String 	Content producer or originator name; for example, “Warner Bros”. 	GaryKurtz
+cat 	String
+Array
+Array of IAB content categories that describe the content producer. 	IAB1-5,IAB1-6
+domain 	String 	Highest level domainof the content producer; for example, “producer.com”. 	producer.com
+Device object
+OpenWrap Key 	ORTB 2.5 Key 	Type 	Description 	Example
+dev.[param] 	bidrequest.device.[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	22/43
+
+-- 22 of 43 --
+
+Parameter 	Type 	Description 	Example
+0 = tracking is unrestricted
+1 = tracking must be limited
+per commercial guidelines.
+Note: Consult each bidderʼs
+documentation to understand
+how they process this field.
+ip 	String 	IPv4 address closest to
+device.
+It can be derived from
+request headers in following
+sequence.
+* HTTP_RLNCLIENTIPADDR
+* HTTP_SOURCE_IP
+*
+HTTP_X_CLUSTER_CLIENT_IP
+* HTTP_X_FORWARDED_IP
+* REMOTE_ADDR
+127.0.0.1
+ipv6 	String 	IP address closest to device
+as IPv6.
+2001:db8::8a2e:370:7334
+devicetype 	Integer 	The general type of device. 	1
+make 	String 	Device make (for example,
+“Apple”)
+Samsung
+model 	String 	Device model (for example,
+“iPhone”)
+Galaxy-A70S
+os 	String 	Device operating system (for
+example, “iOS”).
+Android
+osv 	String 	Device operating system
+version (for example, “3.1.2”)
+MarshMellow
+hwv 	String 	Hardware version of the
+device (for example, “5S” for
+iPhone 5S).
+A70s
+h 	Integer 	Physical height of the screen
+in pixels
+768
+w 	Integer 	Physical width of the screen
+in pixels
+1366
+ppi 	Integer 	Screen size as pixels per
+linear inch.
+4096
+pxratio 	Float 	The ratio of physical pixels to
+device independent pixels
+1.3
+js 	Integer 	Support for JavaScript.
+0 = No
+1 = Yes
+1
+geofetch 	Integer 	Indicates if the geolocation
+API will be available to
+JavaScript code running in
+the banner
+0
+},
+"id": "28635736ddc2bb1_4",
+"iframebuster": [
+"1"
+],
+"instl": 1,
+"pmp": {
+"deals": [
+{
+"at": 1,
+"bidfloor": 1.2,
+"bidfloorcur": "USD",
+"id": "123",
+"wadomain": [
+"WD1",
+"WD2"
+],
+"wseat": [
+"IAB-1",
+"IAB-2"
+]
+}
+],
+"private_auction": 1
+},
+"secure": 0,
+"tagid": "47samurai_0x0_OW_CTV",
+"video": {
+"api": [
+1,
+2
+],
+"battr": [
+6,
+7
+],
+"boxingallowed": 1,
+"companiontype": [
+1,
+2,
+3
+],
+"delivery": [
+2
+],
+"h": 480,
+"linearity": 1,
+"maxbitrate": 1999,
+"maxduration": 35,
+"mimes": [
+"video/3gpp",
+"video/mp4",
+"video/webm"
+],
+"minbitrate": 1200,
+"minduration": 30,
+"placement": 5,
+"playbackend": 1,
+"playbackmethod": [
+1
+],
+"pos": 7,
+"protocols": [
+2,
+3,
+5,
+6,
+7,
+8
+],
+"sequence": 4,
+"skip": 1,
+"skipafter": 15,
+"skipmin": 10,
+"startdelay": 2,
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	23/43
+
+-- 23 of 43 --
+
+Parameter 	Type 	Description 	Example
+0 = No
+1 = Yes
+flashver 	String 	Version of Flash supported
+by the browser.
+1.1
+language 	String 	Browser language using ISO-
+639-1-alpha-2.
+en-US
+carrier 	String 	Carrier or ISP (for example,
+“VERIZON”) using exchange-
+curated string names, which
+once deduced, should be
+published to bidders.
+VERIZON
+mccmnc 	String 	Mobile carrier as the
+concatenated MCC-MNC
+code (for example, “310-005”
+identifies Verizon Wireless
+CDMA in the USA).
+See the Wikipedia article on
+Mobile country codes for
+further examples.
+Note that the dash between
+the MCC and MNC segments
+is required to ensure
+accurate parsing.
+310-005
+connectiontype 	Integer 	Network connection type. 	2
+ifa 	String 	ID sanctioned for advertiser
+use in the clear (that is, not
+hashed).
+EA7583CD-A667-48BC-B806-42ECB2B48606
+didsha1 	String 	Hardware device ID (for
+example, IMEI); hashed via
+SHA1.
+613b4d2f6a09ee5f820d670a1d5b1cc4ccc08bc2
+didmd5 	String 	Hardware device ID (for
+example, IMEI); hashed via
+MD5.
+12d2cd0eacd05dae666c4a5ff3067e42
+dpidsha1 	String 	Platform device ID (for
+example, Android ID); hashed
+via SHA1.
+613b4d2f6a09ee5f820d670a1d5b1cc4ccc08bc2
+dpidmd5 	String 	Platform device ID (for
+example, Android ID); hashed
+via MD5.
+12d2cd0eacd05dae666c4a5ff3067e42
+macsha1 	String 	MAC address of the device;
+hashed via SHA1.
+613b4d2f6a09ee5f820d670a1d5b1cc4ccc08bc2
+macmd5 	String 	MAC address of the device;
+hashed via MD5.
+12d2cd0eacd05dae666c4a5ff3067e42
+dev.ext.ifa_type 	bidrequest.device.ext.ifa_type 	string 	This parameter is used to identify the source of the
+IFA, whether that is device-generated or whether it
+is a publisher-provided IFA or a temporary/session
+IFA. Without this context,
+the usefulness of the IFA is limited.
+The following are recommended values for the
+ifa_type
+"sessionid
+"w": 320
+}
+}
+],
+"regs": {
+"ext": {
+"gdpr": 1,
+"us_privacy": "1YNN"
+}
+},
+"site": {
+"cat": [
+"IAB1-5"
+],
+"content": {
+"album": "Action",
+"artist": "GeorgeLucas",
+"cat": [
+"IAB1-1",
+"IAB1-2"
+],
+"contentrating": "MPAA",
+"context": 1,
+"embeddable": 1,
+"episode": 1,
+"genre": "Action",
+"id": "381d2e0b-548d-4f27-bfdd-e6e66f43557e",
+"isrc": "2",
+"keywords": "ActionMovies",
+"language": "en-US",
+"len": 12000,
+"livestream": 1,
+"prodq": 1,
+"producer": {
+"cat": [
+"IAB1-5",
+"IAB1-6"
+],
+"domain": "producer.com",
+"id": "123",
+"name": "GaryKurtz"
+},
+"qagmediarating": 1,
+"season": "Season3",
+"series": "StarWars",
+"sourcerelationship": 1,
+"title": "StarWars",
+"url": "http://www.pubmatic.com/test/",
+"userrating": "9-Stars",
+"videoquality": 1
+},
+"domain": "ebay.com",
+"ext": {
+"amp": 0
+},
+"id": "123",
+"keywords": "Cloths",
+"mobile": 1,
+"name": "EbayShopping",
+"page": "http://ebay.com/inte/automation/s2s/pwt_parameter_validation_muti_slot_multi_size.html?videobid=5",
+"pagecat": [
+"IAB1-5"
+],
+"privacypolicy": 1,
+"publisher": {
+"cat": [
+"IAB1-5"
+],
+"domain": "publisher.com",
+"id": "159396",
+"name": "Test Publisher"
+},
+"ref": "http://ebay.com/home",
+"search": "NewCloths",
+"sectioncat": [
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	24/43
+
+-- 24 of 43 --
+
+Parameter 	Type 	Description 	Example
+See ifa_type table below
+dev.ext.session_id 	bidrequest.device.ext.session_id 	string 	The session ID parameter accepts a UUID value,
+which is a privacy-preserving advertising identifier
+used for frequency capping purposes only.
+"EA7583CD
+A667-48BC
+B806-
+42ECB2B4
+Ifa_type
+The Device object can also contain the Geo parameter object.
+The User object is a child of BidRequest described above. The next table shows the OpenWrap key to reference User objects, and for comparison, the
+equivalent OpenRTB 2.5 key to reference User objects.
+The User object can also contain the Geo parameter object.
+The following table lists the parameters available to let you configure User objects.
+Parameter 	Type 	Description 	Example
+id 	String 	Exchange-specific ID for the user.
+At least one of idor buyeruidis recommended.
+45067fec-eab7-4ca0-ad3a-87b01f21846a
+buyeruid 	String 	Buyer-specific ID for the user as mapped by
+the exchange for the buyer.
+At least one of buyeruidor idis recommended.
+45067fec-eab7-4ca0-ad3a-87b01f21846a
+yob 	Integer 	Year of birth as a 4-digit integer. 	1990
+gender 	String 	Gender, where “M” = male,“F” = female, “O” =
+known to be other (that is, omitted is
+unknown).
+M
+keywords 	String 	Comma separated list of keywords, interests,
+or intent.
+Movies
+customdata 	String 	Optional feature to pass bidder data that was
+set in the exchangeʼs cookie.
+The string must be in base85 cookie-safe
+characters and be in any format.
+StarWars
+"IAB1-5"
+]
+},
+"source": {
+"tid": "1559039248176"
+},
+"tmax": 989,
+"user": {
+"buyeruid": "45067fec-eab7-4ca0-ad3a-87b01f21846a",
+"customdata": "StarWars",
+"data": [
+{
+"ext": {},
+"id": "StarWars",
+"name": "StarWars"
+}
+],
+"ext": {
+"consent": "BOEFEAyOEFEAyAHABDENAI4AAAB9vABAASA"
+},
+"gender": "M",
+"geo": {
+"accuracy": 10,
+"city": "Mumbai",
+"country": "India",
+"ipservice": 1,
+"lat": 72.6,
+"lon": 72.6,
+"metro": "Mumbai",
+"region": "Maharashtra",
+"regionfips104": "MAHA",
+"type": 1,
+"utcoffset": 120,
+"zip": "123456"
+},
+"id": "45067fec-eab7-4ca0-ad3a-87b01f21846a",
+"keywords": "Movies",
+"yob": 1990
+},
+"wseat": [
+"nike",
+"puma",
+"reebok"
+]
+}
+},
+"matchedimpression": {
+"pubmatic": 0
+},
+"responsetimemillis": {
+"pubmatic": 776
+},
+"tmaxrequest": 989
+}
+}
+Type 	Device or platform
+aaid 	Android ID
+afai 	Amazon Fire ID
+dpid 	Device provided id, based on historical usage
+idfa 	Apple ID
+msai 	Microsoft ID
+ppid 	Publisher Provided ID
+rida 	Roku Id
+sessionid 	SessionID / Synthetic ID
+sspid 	SSP provided id
+User object
+OpenWrap Key 	ORTB 2.5 Key
+user.[param] 	bidrequest.user.[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	25/43
+
+-- 25 of 43 --
+
+Parameter 	Type 	Description 	Example
+Proper JSON encoding must be used to
+include “escaped” quotation marks.
+ext.consent 	String 	GDPR consent string should be passed here. 	BOEFEAyOEFEAyAHABDENAI4AAAB9vABAASA
+data 	oRTB user
+data JSON
+Array
+Additional user data. Each Data object
+represents a different data source.
+The field value should be url encoded.
+[{"name":"publisher.com","segment":[{"id":"1"}]}]
+user.ext.eids 	oRTB eids
+JSON array
+Universal User ID support: establishing
+pseudonymous IDs for users.
+The field value should be URL encoded.
+[{"source":"id5-sync.com","uids":
+[{"id":"LENGTH_GREATER_THAN_10","atype":1,"ext":{}}]}]
+The Geo object is a child of the Device and User objects, described above. The next table shows the OpenWrap keys to reference the Geo object from
+Device and User contexts, and for comparison, the equivalent OpenRTB 2.5 keys.
+Data object
+Parameter 	Type 	Description
+id 	string 	Exchange-specific ID for the data provider.
+name 	string 	Exchange-specific name for the data provider
+segment 	object array 	An array of Segment objects that contain the actual data values.
+ext 	object 	Placeholder for exchange-specific extensions to OpenRTB.
+Segment object
+Key 	Data type 	Description
+id 	string 	ID of the data segment specific to the data provider.
+value 	string 	String representation of the data segment value.
+name 	string 	Name of the data segment specific to the data provider.
+ext 	Object 	Placeholder for exchange-specific extensions to OpenRTB.
+EID object
+Key 	Data type 	Description
+source 	string 	Source or technology provider responsible for the set of included IDs. Expressed as a top-level domain.
+id 	string 	Unique identifier for user information generated using valid partner response.
+uids 	object array 	An array of extended ID UID objects from the given source.
+ext 	object 	Optional vendor-specific extensions.
+UID object
+Key 	Data
+type
+Description
+id 	string 	Cookie or platform-native identifier.
+atype 	integer 	Type of user agent the match is from. It is highly recommended to set this, as many DSPs separate app-native IDs from
+browser-based IDs and require a type value for ID resolution.
+ext 	object 	Optional vendor-specific extensions.
+Geo object
+OpenWrap Keys 	ORTB 2.5 Keys
+dev.geo.lat.[param] 	bidrequest.device.geo.[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	26/43
+
+-- 26 of 43 --
+
+The following table lists the parameters available to let you configure Geo objects.
+Parameter 	Type 	Description 	Example
+lat 	Float 	Latitude from -90.0 to +90.0, where negative is south. 	72.6
+lon 	Float 	Longitude from -180.0 to +180.0, where negative is west. 	72.6
+type 	Integer 	Source of location data; recommended when passing lat/lon. 	1
+accuracy 	Integer 	Estimated location accuracy in meters;
+Recommended when lat/lon are specified and derived from a deviceʼs location services (that is, type = 1).
+Note that this is the accuracy as reported from the device. Consult OS specific documentation (for example,
+Android, iOS) for exact interpretation.
+10
+lastfix 	Integer 	Number of seconds since this geolocation fix was established.
+Note that devices may cache location data across multiple fetches.
+Ideally, this value should be from the time the actual fix was taken.
+0
+ipservice 	Integer 	Service or provider used to determine geolocation from IP address if applicable (that is, type = 2). 	1
+country 	String 	Country code using ISO-3166-1-alpha-3 	India
+region 	String 	Region code using ISO-3166-2; 2-letter state code if USA. 	Maharashtra
+regionfips104 	String 	Region of a country using FIPS 10-4 notation.
+While OpenRTB supports this attribute, it has been withdrawn by NIST in 2008.
+MAHA
+metro 	String 	Google metro code; similar to but not exactly Nielsen DMAs. 	Mumbai
+city 	String 	City using United Nations Code for Trade and Transport Locations. 	Mumbai
+zip 	String 	Zip or postal code. 	123456
+utcoffset 	Integer 	Local time as the number +/- of minutes from UTC. 	120
+The Regs object is a child of BidRequest described above. The next table shows the OpenWrap key to reference Regs objects, and for comparison, the
+equivalent OpenRTB 2.5 key to reference Regs objects. Note that the Regs uses the Ext object to accommodate newer regulations like GDPR and US
+Privacy, which are not covered in the oRTB 2.5 specification.
+The following table lists the parameters available to let you configure User objects.
+Parameter 	Type 	Description 	Example
+coppa 	Integer 	Indicates whether the BidRequest
+is subject to the COPPA regulations
+established by the US FTC.
+0 = No
+1 = Yes
+1
+gpp 	String 	Contains the Global Privacy
+Platformʼs consent string. See the
+DBACNYACPXxRfAPXxRfAAfKABENB-CgAAAAAAAAAAYgAAAAAAAA1YNN
+OpenWrap Keys 	ORTB 2.5 Keys
+user.geo.lat.[param] 	bidrequest.user.geo.[param]
+Regulation object
+OpenWrap Key 	ORTB 2.5 Key
+regs.[param] 	bidrequest.regs.[param]
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	27/43
+
+-- 27 of 43 --
+
+Global Privacy Platform
+specification for more details.
+gpp_sid 	Array
+Integer
+Array of the section(s) of the string
+which should be applied for the
+transaction. See the GPP Section
+Information for more details.
+Generally, gpp_sid
+contains only one value,
+but there are edge cases
+where more than one may
+apply.
+GPP Section 3 (Header)
+and 4 (Signal Integrity) are
+not required.
+2,6
+Sample GET Request for GPP params Expand source
+http://hbopenbid.pubmatic.com/video/openrtb?
+regs.gpp=DBACNYA~CPXxRfAPXxRfAAfKABENB-
+CgAAAAAAAAAAYgAAAAAAAA~1YNN&amp;regs.gpp_sid=2,6
+ext.gdpr 	Integer 	Indicates whether GDPR applies to
+the BidRequest.
+0 = No
+1 = Yes
+1
+ext.us_privacy 	String 	CCPA string for the BidRequest, in
+US Privacy string format.
+1YNN
+The Ext object is a child of BidRequest described above. The next table shows the OpenWrap key to reference Ext objects, and for comparison, the
+equivalent OpenRTB 2.5 key to reference Ext objects.
+The following table lists the parameters available to let you configure User objects.
+Parameter 	Type 	Description 	Example
+versionid 	Integer 	PubMatic OpenWrap specific profile versionid. 	1
+sumry_disable 	Integer 	PubMatic OpenWrap should return detailed summary in response extension:
+0 = Summary will be returned in response extension
+1 = Summary will not be returned in response extension
+1
+clientconfig 	Integer 	PubMatic OpenWrap specific configuration. 	1
+We can add any number of extension parameters dynamically by providing nested objects separated by dot, resulting in a String Parameter.
+To learn about supporting other data types in the Ext object…
+Contact the PubMatic OpenWrap Team.
+Passing sample ext parameter such as, req.ext.ow.bidder.name=pubmatic and req.ext.ow.pubmatic.consent=present:
+OpenWrap-specific Extension object
+OpenWrap Key 	ORTB 2.5 Key
+req.ext.wrapper.[param] 	bidrequest.ext.[param]
+Dynamic Extension object
+Dynamic Extension Parameter example
+{
+"ext": {
+"ow": {
+"bidder": {
+"name":"pubmatic"
+},
+"pubmatic" : {
+"consent":"present"
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	28/43
+
+-- 28 of 43 --
+
+Data types currently unsupported for ext object:
+JSON Integer
+JSON Double
+JSON Array Integer
+JSON Array Double
+JSON Array String
+JSON Array Objects
+You can use the Ext object to add String parameters to the object keys shown below:
+Sample Video BidRequest Using cURL
+cURL
+}
+}
+}
+}
+Extension Prefix Keys 	ORTB 2.5 Key
+req.ext 	bidrequest.ext
+src.ext 	bidrequest.source.ext
+regs.ext 	bidrequest.regs.ext
+imp.ext 	bidrequest.imp[0].ext
+imp.vid.ext 	bidrequest.imp[0].video.ext
+site.ext 	bidrequest.site.ext
+app.ext 	bidrequest.app.ext
+site.pub.ext 	bidrequest.site.publisher.ext
+site.cnt.ext 	bidrequest.site.content.ext
+site.cnt.prod.ext 	bidrequest.site.content.producer.ext
+app.pub.ext 	bidrequest.app.publisher.ext
+app.cnt.ext 	bidrequest.app.content.ext
+app.cnt.prod.ext 	bidrequest.app.content.producer.ext
+dev.ext 	bidrequest.device.ext
+dev.geo.ext 	bidrequest.device.geo.ext
+user.ext 	bidrequest.user.ext
+user.geo.ext 	bidrequest.user.geo.ext
+Example BidRequest
+curl -v
+"http://172.16.4.192:7878/video/vast?
+imp.tagid=%2F15671365%2FDMDemo&app.pub.id=5890&req.ext.wrapper.profileid=3514&req.ext.wrapper.versionid=1&imp.vid.mimes=video
+* 	Trying 172.16.4.192:7878...
+* TCP_NODELAY set
+* Connected to 172.16.4.192 (172.16.4.192) port 7878 (#0)
+> GET /video/vast?
+imp.tagid=%2F15671365%2FDMDemo&app.pub.id=5890&req.ext.wrapper.profileid=3514&req.ext.wrapper.versionid=1&imp.vid.mimes=video/3gpp,vi
+HTTP/1.1
+> Host: 172.16.4.192:7878
+> User-Agent: curl/7.65.2
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Access-Control-Allow-Origin: *
+< Content-Type: application/xml
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	29/43
+
+-- 29 of 43 --
+
+GET API supports single video impression only. It currently does not support multiple impressions.
+Use standard URL encoding for all String parameters to ensure the requested URL doesn't break.
+The default format for all String Array parameters is comma-separated.
+The dynamic extension parameters currently support only JSON string and JSON object data types. No other JSON data types are supported at
+this time.
+AdPod is an Extension object of the BidRequest, or Impression.Video objects described above.
+You reference AdPod objects using the Extension object hierarchy and the table below shows the object path to use for the HTTP GET and POST
+methods.
+The following table lists the parameters available to let you configure AdPod objects.
+< Date: Mon, 16 Mar 2020 12:54:18 GMT
+< Transfer-Encoding: chunked
+<
+<VAST version="3.0"><Ad id="601364"><InLine><AdSystem><![CDATA[Acudeo Compatible]]></AdSystem><AdTitle><![CDATA[VAST 2.0
+Instream Test 1]]></AdTitle><Description><![CDATA[VAST 2.0 Instream Test 1]]></Description><Impression><!
+[CDATA[//t.pubmatic.com/wt?bidid=a9824138-92ac-4185-aa28-7439a06da345&eg=15&en=15&iid=50f9699d-3ab7-4ba9-84b9-
+0a920741bb02&kgpv=%2F15671365%2FDMDemo%400x0&pdvid=1&pid=3514&pn=pubmatic&pubid=5890&purl=&slot=a9824138-92ac-4185-aa28-
+7439a06da345_%2F15671365%2FDMDemo&tst=1584363258]]></Impression><Impression><!
+[CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-
+XVFvQ41&imprId=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&oid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&crID=creative-
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+8D7C-45B8-B733-92951F670AA1&pmZoneId=zone1&pageURL=www.yahoo.com&lpu=ae.com]]></Impression><Impression><!
+[CDATA[https://dsptracker.com/{PSPM}]]></Impression><Error><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_2&ucrid=160175026529250297&impid=48F73E1A-
+7F23-443D-A53C-30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><![CDATA[https://Errortrack.com?
+p=1234&er=[ERRORCODE]]]></Error><Creatives><Creative AdID="601364"><Linear skipoffset="70%"><TrackingEvents><Tracking event=
+"close"><![CDATA[https://mytracking.com/linear/close]]></Tracking><Tracking event="skip"><!
+[CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking event="creativeView"><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_2&ucrid=160175026529250297&impid=48F73E1A-
+7F23-443D-A53C-30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event="start"><!
+[CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=2]]></Tracking>
+<Tracking event="midpoint"><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_2&ucrid=160175026529250297&impid=48F73E1A-
+7F23-443D-A53C-30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=3]]></Tracking><Tracking event="firstQuartile"><!
+[CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=4]]></Tracking>
+<Tracking event="thirdQuartile"><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_2&ucrid=160175026529250297&impid=48F73E1A-
+7F23-443D-A53C-30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=5]]></Tracking><Tracking event="complete"><!
+[CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-
+1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D-A53C-30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=6]]></Tracking>
+</TrackingEvents><Duration><![CDATA[00:00:04]]></Duration><VideoClicks><ClickTracking><![CDATA[http://172.16.4.213/track?
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_2&ucrid=160175026529250297&impid=48F73E1A-
+7F23-443D-A53C-30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=99]]></ClickTracking><ClickThrough><!
+[CDATA[https://www.pubmatic.com]]></ClickThrough></VideoClicks><MediaFiles><MediaFile delivery="progressive" type=
+"video/mp4* Connection #0 to host 172.16.4.192 left intact
+" bitrate="500" width="400" height="300" scalable="true" maintainAspectRatio="true"><!
+[CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]></MediaFile></MediaFiles></Linear></Creative>
+</Creatives><Pricing model="CPM" currency="USD"><![CDATA[15]]></Pricing></InLine></Ad></VAST>
+GET API limitations
+AdPod object
+GET API 	POST API 	Scope notes
+req.ext.adpod.[param] 	bidrequest.ext.adpod.
+[param]
+BidRequest parameters are global in scope, including default values.
+imp.vid.ext.adpod.
+[param]
+video.ext.adpod.[param] 	Impression.Video object parameters override global scope parameters from
+BidRequest.
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	30/43
+
+-- 30 of 43 --
+
+IAB Standard Open RTB 2.5 BidResponse format.
+OpenRTB response for ad pod request
+Parameter 	Type 	Required
+(with a defined
+AdPod object)
+Description 	Default value
+(with a defined AdPod
+object)
+offset 	Integer 	No 	Defines the position where the AdPod might play in a long
+video; for example, 30 min from start. This helps define
+duration based rules to determine when the same ads
+can/cannot play.
+0
+minads 	Integer 	No 	Minimum number of ads to include in the AdPod. 	1
+maxads 	Integer 	No 	Maximum number of ads to include in the AdPod. 	3
+adminduration 	Integer 	No 	Minimum duration in seconds for each ad in the AdPod. 	video.minduration/2
+admaxduration 	Integer 	No 	Maximum duration in seconds for each ad in the AdPod. 	video.maxduration/2
+excladv 	Integer 	No 	Percentage of ads allowed to have the same advertiser in the
+AdPod.
+100
+excliabcat 	Integer 	No 	Percentage of ads allowed to have the same IAB category in
+the AdPod.
+100
+BIDREQUEST-ONLY
+PARAMETERS
+adpod
+(POST method only)
+Object 	Yes 	New object for defining an AdPod object.
+crosspodexcladv 	Integer 	No 	Percentage of ads allowed to have the same advertiser across
+all AdPods in the BidRequest.
+100
+crosspodexcliabcat 	Integer 	No 	Percentage of ads allowed to have the same IAB categories
+across all AdPod s in the BidRequest .
+100
+excliabcatwindow 	Integer 	No 	The number of minutes during which the exclusive IAB rule
+applies. If two AdPods render within a window, then the rule
+applies, otherwise the rule resets.
+100
+excladvwindow 	Integer 	No 	The number of minutes during which the exclusive advertiser
+rule applies. If two AdPod s render within a window, then the
+rule applies, otherwise the rule resets.
+100
+OTT/CTV endpoints
+Endpoint 	Description
+/video/openrtb 	OpenRTB endpoint returns IAB Standard OpenRTB 2.5 formatted response for a BidRequest.
+/video/vast 	VAST endpoint returns VAST-format XML response for a video BidRequest.
+/video/json 	This CTV video endpoint will cache individual AdPod creatives and return targeting values in response.
+OpenRTB endpoint response
+{
+"id": "1559039248176",
+"seatbid": [
+{
+"bid": [
+{
+"id": "67036be7-6fe8-43e3-843b-87cfdc737b78",
+"impid": "28635736ddc2bb",
+"price": 9,
+"adm": "<VAST version=\"4.0\"><Ad id=\"20001\" sequence=\"1\"><InLine><AdSystem version=\"4.0\"><![CDATA[iabtechl
+</AdSystem><AdTitle><![CDATA[iabtechlab video ad 300x250 test]]></AdTitle><Pricing model=\"CPM\" currency=\"USD\"><![CDATA[3]]></Pric
+[CDATA[https://aktrack.pubmatic.com/track?operId=8&crId=9dc797ad-9e31-42d4-a786-e4f01ibv&p=5890&pid=3634&pn=pubmatic&ts=1620145855&v=
+[ERRORCODE]]]></Error><Error><![CDATA[https://example.com/error]]></Error><AdVerifications><Verification vendor=\"iabtechlab.com-omid
+<JavaScriptResource apiFramework=\"omid\" browserOptional=\"true\"><![CDATA[https://ads.pubmatic.com/openbidsdk/omid-validation-verif
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	31/43
+
+-- 31 of 43 --
+
+script/omid-validation-verification-script-v1.js]]></JavaScriptResource><TrackingEvents><Tracking event=\"verificationNotExecuted\"/>
+</TrackingEvents><VerificationParameters><![CDATA[iabtechlab-pubmatic]]></VerificationParameters></Verification></AdVerifications><Im
+[CDATA[https://t.pubmatic.com/wt?bidid=2-613673EF-A07C-4486-8EE9-3FC71A7DC73D&eg=3&en=3&iid=4afcf3b4-d582-4e1e-9800-
+95068bafe3bd&kgpv=%2F15671365%2FDMDemo1%40300x250&pdvid=0&pid=3634&pn=pubmatic&pubid=5890&purl=https%3A%2F%2Fitunes.apple.com%2Fus%2F
+sdk-app%2Fid1175273098%3Fvideobid%3D8&slot=28635736ddc2bb_%2F15671365%2FDMDemo1&tst=1620145855]]></Impression><Impression id=\"Impres
+[CDATA[https://aktrack.pubmatic.com/track?param=impression]]></Impression><Creatives><Creative id=\"5480\" sequence=\"1\"><Linear
+skipoffset=\"00:00:05\"><Duration><![CDATA[00:00:15]]></Duration><TrackingEvents><Tracking event=\"start\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=start]]></Tracking><Tracking event=\"firstQuartile\"><![CDATA[https://aktrack.pubmati
+param=firstQuartile]]></Tracking><Tracking event=\"midpoint\"><![CDATA[https://aktrack.pubmatic.com/track?param=midpoint]]></Tracking
+event=\"thirdQuartile\"><![CDATA[https://aktrack.pubmatic.com/track?param=thirdQuartile]]></Tracking><Tracking event=\"complete\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=complete]]></Tracking><Tracking event=\"progress\" offset=\"00:00:10\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=progress-10]]></Tracking><Tracking event=\"mute\"><![CDATA[https://aktrack.pubmatic.c
+param=mute]]></Tracking><Tracking event=\"unmute\"><![CDATA[https://aktrack.pubmatic.com/track?param=unmute]]></Tracking><Tracking
+event=\"closeLinear\"><![CDATA[https://aktrack.pubmatic.com/track?param=closeLinear]]></Tracking><Tracking event=\"skip\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=skip]]></Tracking></TrackingEvents><VideoClicks><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_01]]></ClickTracking><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_02]]></ClickTracking><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_03]]></ClickTracking><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_04]]></ClickTracking><ClickThrough id=\"blog\"><![CDATA[https://pubmati
+</ClickThrough><CustomClick><![CDATA[https://pubmatic.com]]></CustomClick></VideoClicks><MediaFiles><MediaFile id=\"5241\" delivery=\
+type=\"video/mp4\" bitrate=\"500\" width=\"1440\" height=\"780\" minBitrate=\"360\" maxBitrate=\"1080\" scalable=\"1\" maintainAspect
+codec=\"0\"><![CDATA[https://ads.pubmatic.com/openbidsdk/creative/video/1280x720.mp4]]></MediaFile><![CDATA[/MediaFiles>]]></MediaFil
+</Creative><Extensions><Extension type=\"iab-Count\"><total_available><![CDATA[2]]></total_available></Extension></Extensions></Creat
+</Ad><Ad id=\"20001\" sequence=\"2\"><InLine><AdSystem version=\"4.0\"><![CDATA[iabtechlab]]></AdSystem><AdTitle><![CDATA[iabtechlab
+300x250 test]]></AdTitle><Pricing model=\"CPM\" currency=\"USD\"><![CDATA[3]]></Pricing><Error><![CDATA[https://aktrack.pubmatic.com/
+operId=8&crId=9dc797ad-9e31-42d4-a786-e4f01ibv&p=5890&pid=3634&pn=pubmatic&ts=1620145855&v=0&ier=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://example.com/error]]></Error><AdVerifications><Verification vendor=\"iabtechlab.com-omid\"><JavaScriptResource apiFrame
+browserOptional=\"true\"><![CDATA[https://ads.pubmatic.com/openbidsdk/omid-validation-verification-js-script/omid-validation-verifica
+v1.js]]></JavaScriptResource><TrackingEvents><Tracking event=\"verificationNotExecuted\"/></TrackingEvents><VerificationParameters><!
+[CDATA[iabtechlab-pubmatic]]></VerificationParameters></Verification></AdVerifications><Impression><![CDATA[https://t.pubmatic.com/wt
+613673EF-A07C-4486-8EE9-3FC71A7DC73D&eg=3&en=3&iid=4afcf3b4-d582-4e1e-9800-
+95068bafe3bd&kgpv=%2F15671365%2FDMDemo1%40300x250&pdvid=0&pid=3634&pn=pubmatic&pubid=5890&purl=https%3A%2F%2Fitunes.apple.com%2Fus%2F
+sdk-app%2Fid1175273098%3Fvideobid%3D8&slot=28635736ddc2bb_%2F15671365%2FDMDemo1&tst=1620145855]]></Impression><Impression id=\"Impres
+[CDATA[https://aktrack.pubmatic.com/track?param=impression]]></Impression><Creatives><Creative id=\"5480\" sequence=\"1\"><Linear
+skipoffset=\"00:00:05\"><Duration><![CDATA[00:00:15]]></Duration><TrackingEvents><Tracking event=\"start\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=start]]></Tracking><Tracking event=\"firstQuartile\"><![CDATA[https://aktrack.pubmati
+param=firstQuartile]]></Tracking><Tracking event=\"midpoint\"><![CDATA[https://aktrack.pubmatic.com/track?param=midpoint]]></Tracking
+event=\"thirdQuartile\"><![CDATA[https://aktrack.pubmatic.com/track?param=thirdQuartile]]></Tracking><Tracking event=\"complete\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=complete]]></Tracking><Tracking event=\"progress\" offset=\"00:00:10\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=progress-10]]></Tracking><Tracking event=\"mute\"><![CDATA[https://aktrack.pubmatic.c
+param=mute]]></Tracking><Tracking event=\"unmute\"><![CDATA[https://aktrack.pubmatic.com/track?param=unmute]]></Tracking><Tracking
+event=\"closeLinear\"><![CDATA[https://aktrack.pubmatic.com/track?param=closeLinear]]></Tracking><Tracking event=\"skip\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=skip]]></Tracking></TrackingEvents><VideoClicks><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_01]]></ClickTracking><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_02]]></ClickTracking><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_03]]></ClickTracking><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_04]]></ClickTracking><ClickThrough id=\"blog\"><![CDATA[https://pubmati
+</ClickThrough><CustomClick><![CDATA[https://pubmatic.com]]></CustomClick></VideoClicks><MediaFiles><MediaFile id=\"5241\" delivery=\
+type=\"video/mp4\" bitrate=\"500\" width=\"1440\" height=\"780\" minBitrate=\"360\" maxBitrate=\"1080\" scalable=\"1\" maintainAspect
+codec=\"0\"><![CDATA[https://ads.pubmatic.com/openbidsdk/creative/video/1280x720.mp4]]></MediaFile><![CDATA[/MediaFiles>]]></MediaFil
+</Creative><Extensions><Extension type=\"iab-Count\"><total_available><![CDATA[2]]></total_available></Extension></Extensions></Creat
+</Ad><Ad id=\"20001\" sequence=\"3\"><InLine><AdSystem version=\"4.0\"><![CDATA[iabtechlab]]></AdSystem><AdTitle><![CDATA[iabtechlab
+300x250 test]]></AdTitle><Pricing model=\"CPM\" currency=\"USD\"><![CDATA[3]]></Pricing><Error><![CDATA[https://aktrack.pubmatic.com/
+operId=8&crId=9dc797ad-9e31-42d4-a786-e4f01ibv&p=5890&pid=3634&pn=pubmatic&ts=1620145855&v=0&ier=[ERRORCODE]]]></Error><Error><!
+[CDATA[https://example.com/error]]></Error><AdVerifications><Verification vendor=\"iabtechlab.com-omid\"><JavaScriptResource apiFrame
+browserOptional=\"true\"><![CDATA[https://ads.pubmatic.com/openbidsdk/omid-validation-verification-js-script/omid-validation-verifica
+v1.js]]></JavaScriptResource><TrackingEvents><Tracking event=\"verificationNotExecuted\"/></TrackingEvents><VerificationParameters><!
+[CDATA[iabtechlab-pubmatic]]></VerificationParameters></Verification></AdVerifications><Impression><![CDATA[https://t.pubmatic.com/wt
+613673EF-A07C-4486-8EE9-3FC71A7DC73D&eg=3&en=3&iid=4afcf3b4-d582-4e1e-9800-
+95068bafe3bd&kgpv=%2F15671365%2FDMDemo1%40300x250&pdvid=0&pid=3634&pn=pubmatic&pubid=5890&purl=https%3A%2F%2Fitunes.apple.com%2Fus%2F
+sdk-app%2Fid1175273098%3Fvideobid%3D8&slot=28635736ddc2bb_%2F15671365%2FDMDemo1&tst=1620145855]]></Impression><Impression id=\"Impres
+[CDATA[https://aktrack.pubmatic.com/track?param=impression]]></Impression><Creatives><Creative id=\"5480\" sequence=\"1\"><Linear
+skipoffset=\"00:00:05\"><Duration><![CDATA[00:00:15]]></Duration><TrackingEvents><Tracking event=\"start\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=start]]></Tracking><Tracking event=\"firstQuartile\"><![CDATA[https://aktrack.pubmati
+param=firstQuartile]]></Tracking><Tracking event=\"midpoint\"><![CDATA[https://aktrack.pubmatic.com/track?param=midpoint]]></Tracking
+event=\"thirdQuartile\"><![CDATA[https://aktrack.pubmatic.com/track?param=thirdQuartile]]></Tracking><Tracking event=\"complete\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=complete]]></Tracking><Tracking event=\"progress\" offset=\"00:00:10\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=progress-10]]></Tracking><Tracking event=\"mute\"><![CDATA[https://aktrack.pubmatic.c
+param=mute]]></Tracking><Tracking event=\"unmute\"><![CDATA[https://aktrack.pubmatic.com/track?param=unmute]]></Tracking><Tracking
+event=\"closeLinear\"><![CDATA[https://aktrack.pubmatic.com/track?param=closeLinear]]></Tracking><Tracking event=\"skip\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=skip]]></Tracking></TrackingEvents><VideoClicks><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_01]]></ClickTracking><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_02]]></ClickTracking><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_03]]></ClickTracking><ClickTracking id=\"blog\"><!
+[CDATA[https://aktrack.pubmatic.com/track?param=clickTracking_04]]></ClickTracking><ClickThrough id=\"blog\"><![CDATA[https://pubmati
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	32/43
+
+-- 32 of 43 --
+
+OpenRTB response for non-ad pod request
+OpenRTB response for non-ad pod request
+Content-Type: application/json
+Valid OpenRTB BidResponse
+</ClickThrough><CustomClick><![CDATA[https://pubmatic.com]]></CustomClick></VideoClicks><MediaFiles><MediaFile id=\"5241\" delivery=\
+type=\"video/mp4\" bitrate=\"500\" width=\"1440\" height=\"780\" minBitrate=\"360\" maxBitrate=\"1080\" scalable=\"1\" maintainAspect
+codec=\"0\"><![CDATA[https://ads.pubmatic.com/openbidsdk/creative/video/1280x720.mp4]]></MediaFile><![CDATA[/MediaFiles>]]></MediaFil
+</Creative><Extensions><Extension type=\"iab-Count\"><total_available><![CDATA[2]]></total_available></Extension></Extensions></Creat
+</Ad></VAST>",
+"adomain": [
+"www.pubmatic.com"
+],
+"h": 0,
+"w": 0
+}
+],
+"seat": "prebid_ctv"
+}
+],
+"cur": "USD"
+}
+{
+"id": "1559039248176",
+"seatbid": [
+{
+"bid": [
+{
+"id": "VIDEO12-89A1-41F1-8708-978FD3C0912A",
+"impid": "28635736ddc2bb",
+"price": 8,
+"adm": "<VAST version=\"3.0\"><Ad id=\"601364\"><InLine><AdSystem><![CDATA[Acudeo Compatible]]></AdSystem><AdTitl
+978FD3C0912A&eg=8&en=8&iid=eaae0f32-4df7-4637-9873-6ccd8e15cc68&kgpv=%2F15671365%2FDMDemo1%400x0&pdvid=2&pid=2336&pn=pubmatic&pubid=5
+[CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ4
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+[CDATA[https://127.0.0.1:8080/wt?operId=8&crId=creative-1_1_2&p=5890&pid=2336&pn=pubmatic&ts=1620146146&v=2&ier=[ERRORCODE]]]></Error
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&er=[ERRORCODE]]]></Error><Error><![CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]
+event=\"skip\"><![CDATA[https://mytracking.com/linear/skip]]></Tracking><Tracking event=\"creativeView\"><![CDATA[http://172.16.4.213
+30EE6BBF5F7F&advertiser_id=3170&ecpm=70.000000&e=1]]></Tracking><Tracking event=\"start\"><![CDATA[http://172.16.4.213/track?operId=7
+<Tracking event=\"midpoint\"><![CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=
+[CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_2&ucrid=1601750265
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D
+operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_2&ucrid=160175026529250297&impid=48F73E1A-7F23-443D
+delivery=\"progressive\" type=\"video/mp4\" bitrate=\"500\" width=\"400\" height=\"300\" scalable=\"true\" maintainAspectRatio=\"true
+</InLine></Ad></VAST>",
+"adomain": [
+"ae.com"
+],
+"cid": "17050",
+"crid": "creative-1_1_2",
+"dealid": "PUBDEAL1",
+"h": 0,
+"w": 0
+}
+],
+"seat": "pubmatic"
+}
+],
+"cur": "USD"
+}
+Response Headers
+* Response Headers
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Access-Control-Allow-Origin: *
+< Content-Type: application/json
+< Date: Mon, 16 Mar 2020 12:41:32 GMT
+< Content-Length: 47
+<
+{
+"id": "1559039248176",
+"seatbid": [{
+"bid": [{
+,
+"impid": "28635736ddc2bb1",
+"price": 1.1,
+"adm": "<VAST version=\"3.0\"><![CDATA[\n]]><Ad id=\"1\"><![CDATA[\n]]><Wrapper><![CDATA[\n]]><AdSystem><![CD
+[CDATA[\n]]><Error><![CDATA[http://aktrack.pubmatic.com/track?operId=7&p=159586&s=659893&a=2621943&wa=243&ts=1584005486&wc=23216&crId
+[CDATA[https://image8.pubmatic.com/AdServer/ImgSync?&fp=1&mpc=10&p=159586&gdpr=1&gdpr_consent=BOEFEAyOEFEAyAHABDENAI4AAAB9vABAASA&pmc
+c3a3-4788-8ade-7cf019dda1d3&kgpv=%2F15671365%2FDMDemo%400x0&pdvid=2&pid=1887&pn=pubmatic&pubid=159586&purl=http%3A%2F%2Febay.com%2Fin
+[CDATA[http://aktrack.pubmatic.com/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=159586&siteId=659893&adId=2621943&adType=13&adServerId=243&kefact=1.100000&kaxefact=1.100000&kadNetFrequecy=0&kadwidth
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	33/43
+
+-- 33 of 43 --
+
+OpenWrap OTT/CTV OpenRTB endpoint uses two error formats according to the type of error.
+1. Input parameter error…
+2. SSP Response error…
+&ekaxefact=bgFqXlA7BAA_y0cAZgRlplvbsz1ViYMZk-
+ZoOtN6t7tIV4yN&ekpbmtpfact=bgFqXmI7BAAOigLz24ttvLAd0ktmDVm7f9Pi73FoFB6wxU7X&enpp=bgFqXnU7BABugqBx5MZqgLua_IKRd28xZtHOasI114bVcfhP&crI
+A0E7-4009-9D16-82DB0CE6ADF1&imprId=E43A994E-0139-453F-A0A6-111E3D0BFBAD&oid=E43A994E-0139-453F-A0A6-111E3D0BFBAD&country=Ind&pageURL=
+&fp=1&mpc=10&p=159586&gdpr=1&gdpr_consent=BOEFEAyOEFEAyAHABDENAI4AAAB9vABAASA&pmc=1&pu=https%3A%2F%2Fimage4.pubmatic.com%2FAdServer%2
+[CDATA[http://aktrack.pubmatic.com/track?operId=7&p=159586&s=659893&a=2621943&wa=243&ts=1584005486&wc=23216&crId=adt:13_m:1+2+6+7+8_x
+[CDATA[http://aktrack.pubmatic.com/track?operId=7&p=159586&s=659893&a=2621943&wa=243&ts=1584005486&wc=23216&crId=adt:13_m:1+2+6+7+8_x
+[CDATA[http://aktrack.pubmatic.com/track?operId=7&p=159586&s=659893&a=2621943&wa=243&ts=1584005486&wc=23216&crId=adt:13_m:1+2+6+7+8_x
+[CDATA[http://aktrack.pubmatic.com/track?operId=7&p=159586&s=659893&a=2621943&wa=243&ts=1584005486&wc=23216&crId=adt:13_m:1+2+6+7+8_x
+[CDATA[http://aktrack.pubmatic.com/track?operId=7&p=159586&s=659893&a=2621943&wa=243&ts=1584005486&wc=23216&crId=adt:13_m:1+2+6+7+8_x
+[CDATA[http://aktrack.pubmatic.com/track?operId=7&p=159586&s=659893&a=2621943&wa=243&ts=1584005486&wc=23216&crId=adt:13_m:1+2+6+7+8_x
+[CDATA[http://aktrack.pubmatic.com/track?operId=7&p=159586&s=659893&a=2621943&wa=243&ts=1584005486&wc=23216&crId=adt:13_m:1+2+6+7+8_x
+<VideoClicks><![CDATA[\n]]><ClickTracking><![CDATA[http://aktrack.pubmatic.com/track?operId=7&p=159586&s=659893&a=2621943&wa=243&ts=1
+[CDATA[\n]]></VideoClicks><![CDATA[\n]]></Linear><![CDATA[\n]]></Creative><![CDATA[\n]]></Creatives><![CDATA[\n]]><Extensions><![CDAT
+[CDATA[https://ads.pubmatic.com/AdServer/js/showad.js#PIX&ptask=DSP&SPug=1&fp=1&mpc=10&u=45067fec-eab7-4ca0-ad3a-87b01f21846a&p=15958
+</VAST>",
+"adomain": [
+"ae.com"
+],
+"cid": "23216",
+"crid": "adt:13_m:1+2+6+7+8_x:3_y:3_t:0_va:3_c:23216_tpbt:shashank_nuad:1x1_sc:1_off",
+"h": 0,
+"w": 0
+}],
+"seat": "pubmatic"
+}],
+"cur": "USD"
+}
+Error response
+{
+"ErrorCode": 6,
+"Error": "Invalid Configuration"
+}
+{
+"id": "0a0e40c8-f66d-4c11-9e9a-f7993b6065bb",
+"seatbid": [
+{
+"bid": [
+{
+"id": "90b5a5fc-7b46-47db-8380-820c216ff426",
+"impid": "90b5a5fc-7b46-47db-8380-820c216ff426",
+"price": 0,
+"h": 0,
+"w": 0,
+"ext": {}
+}
+],
+"seat": "pubmatic"
+}
+],
+"ext": {
+"matchedimpression": {
+"pubmatic": 0
+},
+"responsetimemillis": {
+"pubmatic": 55
+},
+"tmaxrequest": 489
+}
+}
+VAST endpoint response
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	34/43
+
+-- 34 of 43 --
+
+The VAST endpoint returns a standard VAST XML response. In the cases of Request ERROR, Application ERROR, or No Bid, the endpoint returns an
+empty VAST tag with error details in the response headers. Supported VAST versions: VAST 2.0, VAST 3.0.
+Content-Type 	application/xml
+X-Ow-Status 	Error details:
+ErrorCode - Integer Error Code
+Error - Granular Error Message
+Sample Error Details Expand source
+{"ErrorCode":700,"Error":"Missing Profile ID"}
+Valid VAST response with headers…
+Response headers
+Endpoint examples
+* Response Headers
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Access-Control-Allow-Origin: *
+< Content-Type: application/xml
+< Date: Mon, 16 Mar 2020 12:19:43 GMT
+< Transfer-Encoding: chunked
+<
+<VAST version="3.0">
+<Ad id="601364">
+<InLine>
+<AdSystem>
+<![CDATA[Acudeo Compatible]]>
+</AdSystem>
+<AdTitle>
+<![CDATA[VAST 2.0 Instream Test 1]]>
+</AdTitle>
+<Description>
+<![CDATA[VAST 2.0 Instream Test 1]]>
+</Description>
+<Impression>
+<![CDATA[//t.pubmatic.com/wt?bidid=ed49d230-b9fa-4d62-9d4f-2f2ec9e9142a&eg=15&en=15&iid=35226ad9-acd2-4e16-984b-7d455
+2f2ec9e9142a_%2F15671365%2FDMDemo&tst=1584361062]]>
+</Impression>
+<Impression>
+<![CDATA[http://172.16.4.213/AdServer/AdDisplayTrackerServlet?
+operId=1&pubId=5890&siteId=47163&adId=1405268&adType=13&adServerId=243&kefact=70.000000&kaxefact=70.000000&kadNetFrequecy=0&kadwidth=
+m5DoNSep-RXGDr&ekaxefact=Ad8wWwRUCwAGir4Zzl1eF0bKiC-qrCV0D0yp_eE7YizB_BQk&ekpbmtpfact=Ad8wWxRUCwD7qgzwwPE2LnS5-Ou19uO5amJl1YT6-XVFvQ4
+1_1_2&ucrid=160175026529250297&campaignId=17050&creativeId=0&pctr=0.000000&wDSPByrId=511&wDspId=6&wbId=0&wrId=0&wAdvID=3170&isRTB=1&r
+</Impression>
+<Impression>
+<![CDATA[https://dsptracker.com/{PSPM}]]>
+</Impression>
+<Error>
+<![CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&crId=creative-1_1_
+</Error>
+<Error>
+<![CDATA[https://Errortrack.com?p=1234&er=[ERRORCODE]]]>
+</Error>
+<Creatives>
+<Creative AdID="601364">
+<Linear skipoffset="70%">
+<TrackingEvents>
+<Tracking event="close">
+<![CDATA[https://mytracking.com/linear/close]]>
+</Tracking>
+<Tracking event="skip">
+<![CDATA[https://mytracking.com/linear/skip]]>
+</Tracking>
+<Tracking event="creativeView">
+<![CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&cr
+</Tracking>
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	35/43
+
+-- 35 of 43 --
+
+VAST Error Response
+When OpenWrap Over The Top (OTT) sends the field user.ext.eids containing extended user identifiers (EID) to a Demand Side Platforms (DSP),
+OpenWrap OTT removes valid prefixes from the ID attributes of UIDs, irrespective of source. This ensures that IDs are compatible with the DSP.
+The table below provides the list of prefixes that are removed:
+See also GET API parameters
+<Tracking event="start">
+<![CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&cr
+</Tracking>
+<Tracking event="midpoint">
+<![CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&cr
+</Tracking>
+<Tracking event="firstQuartile">
+<![CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&cr
+</Tracking>
+<Tracking event="thirdQuartile">
+<![CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&cr
+</Tracking>
+<Tracking event="complete">
+<![CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&cr
+</Tracking>
+</TrackingEvents>
+<Duration>
+<![CDATA[00:00:04]]>
+</Duration>
+<VideoClicks>
+<ClickTracking>
+<![CDATA[http://172.16.4.213/track?operId=7&p=5890&s=47163&a=1405268&wa=243&ts=1529929473&wc=17050&cr
+</ClickTracking>
+<ClickThrough>
+<![CDATA[https://www.pubmatic.com]]>
+</ClickThrough>
+</VideoClicks>
+<MediaFiles>
+<MediaFile delivery="progressive" type="video/mp4" bitrate="500" width="400" height="300" scalable="true"
+<![CDATA[https://stagingams.pubmatic.com:8443/openwrap/media/pubmatic.mp4]]>
+</MediaFile>
+</MediaFiles>
+</Linear>
+</Creative>
+</Creatives>
+<Pricing model="CPM" currency="USD">
+<![CDATA[15]]>
+</Pricing>
+</InLine>
+</Ad>
+</VAST>
+* Response Headers
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Access-Control-Allow-Origin: *
+< Content-Type: application/xml
+< X-Ow-Status: {"ErrorCode":700,"Error":"Missing Profile ID"}
+< Date: Mon, 16 Mar 2020 12:20:41 GMT
+< Content-Length: 21
+<
+* Connection #0 to host 172.16.4.192 left intact
+<VAST version="2.0"/>
+CTV VIDEO GET Endpoint: Ensuring Compatibility with Demand Side Platforms
+Prefixes are case sensitive.
+Table of Prefixes
+Third Party User ID System 	Prefix in user.ext.eids.id 	EID Source (user.ext.eids.source)
+Unified ID 2.0 	UID2: 	uidapi.com
+ID 	ID5: 	id5-sync.com
+Blockgraph ID 	BGID: 	blockgraph.com
+European Unified ID 	euid: 	euid.eu
+Google PAIR ID 	PAIRID: 	google.com
+LiveRamp IDL 	IDL: 	liveramp.com
+Yahoo Connect ID 	connectid: 	yahoo.com
+First ID 	firstid: 	first-id.fr
+Utiq 	utiq: 	utiq.com
+Code Samples
+Input to OpenWrap:
+{code:java}
+\[{"source":"uidapi.com","uids":[{"id":""}, {"id":"AgAACYa0cG2jcVcM42xG"}]}, {"source":"liveramp.com","uids":
+[{"id":"AgAACYa0cG2jcVcM42xG"}]}, {"source":"yahoo.com","uids":[{"id":""},{"id":""}]}] {code}
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	36/43
+
+-- 36 of 43 --
+
+GET API Parameter 	POST API Parameter Object 	Type 	Mandatory(If
+Content object
+transparency is
+Expected)
+Description 	Example
+req.ext.prebid.transparency.content 	req.ext.prebid.transparency.content 	Object 	Y 	PubMatic OpenWrap
+specific content object
+transparency rules for
+bidders.
+Use bidder code as key
+for bidder to content
+object transparency rule
+mappings. Use default
+key for setting fallback
+rule to be used when
+bidder specific rule is not
+mentioned.
+Content Object
+Transparency Rule
+parameter:
+See Parameters table
+below
+{
+"pubmatic":{
+"include":false,
+"keys":[
+"genre"
+]
+},
+"default":{
+"include":false,
+"keys":[
+"genre"
+]
+}
+}
+Parameter 	Description
+include 	Determines whether content object parameter mentioned in keys should be passed to bidder or not as part of orb content object.
+include = true - keys will be part of content object. If keys = empty, the send complete object
+include = false - keys will not be send as part of content object. if keys = empty don't send orb content object.
+keys 	The content object fields that need to be included/excluded from content object in request. This parameter is used to send
+full/partial content object to bidders.
+Keys can be any of the attributes mentioned in Content Object (3.2.16) table. Nested object for keys are not supported.
+Currently, OpenWrap server-side works only in USD currency. OpenWrap currently automatically replaces any other currency with USD. Note that
+ECPM values are also reported in USD.
+Server Side Auction is done for all CTV requests whether or not the req.ext.wrapper.ssauction parameter is defined.
+Outgoing request from OpenWrap:
+{code:java}
+\[{"source":"uidapi.com","uids":[{"id":"AgAACYa0cG2jcVcM42xG"}]}{"source":"liveramp.com","uids":
+[{"id":"AgAACYa0cG2jcVcM42xG"}]}] {code}
+Only One Object Present in EIDS and that is also invalid, OpenWrap will remove eids object from request
+{code:java}
+\[{"source":"uidapi.com","uids":[{"id":""}]}] 	{code}
+Prebid Ext Parameters (req.ext.prebid)
+Parameters
+CTV endpoint assumptions
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	37/43
+
+-- 37 of 43 --
+
+Creative Blocked Attributes, Blocked Domains, Blocked Categories, and Allowlisted Categories are not yet implemented by OpenWrap CTV video.
+OpenWrap will forward the request to partners via prebid and it is the partner's sole responsibility to serve creatives based on these attributes.
+Profile level platform is not checked for CTV endpoints, which means Display/InApp other profiles are served for video request.
+Profile ID is mandatory for CTV requests using both GET and POST methods.
+The following sections describe the objects that make up a BidResponse.
+Multiple impressions can be generated for each ad pod request.
+Standard OpenRTB response will be rendered for non-ad pod requests.
+The table below describes the parent BidResponse object, which encapsulates the SeatBid object array.
+The table below lists the parameters for the SeatBid object, whose main function is to deliver an array of Bid objects for the Impressions in the
+BidRequest.
+Parameter 	Type 	Supports ad pod
+requests?
+Description
+bid 	object
+array
+Yes 	Array of 1 or more Bid objects (Section 4.2.3) each related to an impression. Multiple bids can
+relate to the same impression.
+seat 	string 	Yes 	ID of the buyer seat on whose behalf the bid was made.
+For example, an advertiser, agency, or in the case of a BidRequest with AdPods, the seat value is
+pubmatic_ow.
+group 	integer 	NA 	0 = impressions can be won individually
+1 = impressions must be won or lost as a group
+ext 	object 	NA 	Placeholder for bidder-specific extensions to OpenRTB.
+The table below lists the parameters for the Bid objects, which represent a winning bid for an Impression. The BidResponse object can encapsulate
+many Bids within a SeatBid object's bid property.
+BidResponse specification
+BidResponse object
+PARAMETER 	TYPE 	Supports ad pod
+requests?
+DESCRIPTION
+id 	string 	Yes 	ID of the bid request to which this is a response.
+seatbid 	object
+array
+Yes 	Array of seatbid objects; 1+ required if a bid is to be made.
+bidid 	string 	No 	Bidder generated response ID to assist with logging/tracking.
+cur 	string 	Yes 	Bid currency using ISO-4217 alpha codes.default USD.
+customdata 	string 	Yes 	Optional feature to allow a bidder to set data in the exchangeʼs cookie. The string must be in
+base85 cookie-safe characters and be in any format. Proper JSON encoding must be used to
+include “escaped” quotation marks.
+nbr 	integer 	No 	Reason for not bidding.
+ext 	object 	Yes 	Placeholder for bidder-specific OpenRTB extensions.
+SeatBid object
+Bid object
+Parameter 	Type 	Supports ad
+pod requests?
+Description
+id 	string 	Yes 	Bidder generated bid ID to assist with logging/tracking.
+impid 	string 	Yes 	ID of the Imp object in the related bid request.
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	38/43
+
+-- 38 of 43 --
+
+Parameter 	Type 	Supports ad
+pod requests?
+Description
+price 	float 	Yes 	Bid price expressed as CPM although the actual transaction is for a unit impression only. Note
+that while the type indicates float, integer math is highly recommended when handling currencies
+(e.g., BigDecimal in Java).
+nurl 	string 	No 	Win notice URL called by the exchange if the bid wins (not necessarily indicative of a delivered,
+viewed, or billable ad); optional means of serving ad markup.
+burl 	string 	No 	Billing notice URL called by the exchange when a winning bid becomes billable based on
+exchange-specific business policy (e.g., typically delivered, viewed, etc.).
+lurl 	string 	No 	Loss notice URL called by the exchange when a bid is known to have been lost. Exchange-
+specific policy may preclude support for loss notices or the disclosure of winning clearing prices
+resulting in ${AUCTION_PRICE} macros being removed (i.e., replaced with a zero-length string).
+adm 	string 	Yes 	Optional means of conveying ad markup in case the bid wins; supersedes the win notice if
+markup is included in both.
+adid 	string 	ID of a preloaded ad to be served if the bid wins.
+adomain 	string
+array
+Yes 	Advertiser domain for block list checking (e.g., “ford.com”). This can be an array of for the case
+of rotating creatives. Exchanges can mandate that only one domain is allowed.
+bundle 	string 	No 	A platform-specific application identifier intended to be unique to the app and independent of the
+exchange. On Android, this should be a bundle or package name (e.g., com.foo.mygame). On
+iOS, it is a numeric ID.
+iurl 	string 	No 	URL without cache-busting to an image that is representative of the content of the campaign for
+ad quality/safety checking.
+cid 	string 	No 	Campaign ID to assist with ad quality checking; the collection of creatives for which iurl should
+be representative.
+crid 	string 	No 	Creative ID to assist with ad quality checking.
+tactic 	string 	No 	Tactic ID to enable buyers to label bids for reporting to the exchange the tactic through which
+their bid was submitted. The specific usage and meaning of the tactic ID should be
+communicated between buyer and exchanges a priori.
+cat 	string
+array
+Yes 	IAB content categories of the creative.
+attribute 	integer
+array
+No 	Set of attributes describing the creative
+api 	integer 	No 	API required by the markup if applicable
+protocol 	integer 	No 	Video response protocol of the markup if applicable.
+qamediarating 	integer 	No 	Creative media rating per IQG guidelines.
+language 	string 	No 	Language of the creative using ISO-639-1-alpha-2. The non-standard code “xx” may also be
+used if the creative has no linguistic content (e.g., a banner with just a company logo).
+dealid 	string 	No 	Reference to the deal.id from the bid request if this bid pertains to a private marketplace direct
+deal.
+w 	integer 	No 	Width of the creative in device independent pixels (DIPS)
+h 	integer 	No 	Height of the creative in device independent pixels (DIPS).
+wratio 	integer 	No 	Relative width of the creative when expressing size as a ratio. Required for Flex Ads.
+hratio 	integer 	No 	Relative height of the creative when expressing size as a ratio. Required for Flex Ads.
+exp 	integer 	No 	Advisory as to the number of seconds the bidder is willing to wait between the auction and the
+actual impression.
+ext 	object 	Yes 	Placeholder for bidder-specific extensions to OpenRTB.
+Endpoint error codes
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	39/43
+
+-- 39 of 43 --
+
+The expandable tables below define the enumerated values you will to configure the various objects and parameters that make up your BidRequests.
+Error Code 	Error Message 	HTTP Status Code 	Scenarios
+500 	Empty Response 	500 	Any Panic in Program
+600 	Missing Request ID 	400 	req.id is not specified
+601 	Missing Impressions 	400 	req.imp is not specified
+602 	Missing Site/App Object 	400 	req.site and req.app both not present
+603 	Site App Both Present 	400 	req.site and req.app both present in request
+604 	Missing Publisher ID 	400 	req.site.publisher.id or req.app.publisher.id not specified
+605 	Missing Tag ID 	400 	req.imp.tagid is not specified
+606 	Missing Impression ID 	400 	req.imp.id is not specified
+607 	Missing Ad Type(Banner/Video) 	400 	banner/native/audio/video any one not specified in request
+608 	Missing Ad Sizes 	400 	banner.w, banner.h, or banner.format is not specified
+609 	Missing MIMEs 	400 	video.mimes or audio.mimes not specified
+610 	Missing Native Request Payload 	400 	native.request payload not specified
+611 	Missing Video Object 	400 	video object missing for ctv requests
+700 	Missing Profile ID 	400 	mandatory profile id missing in request
+Enumerated value definitions
+Video Protocols
+Value 	Description
+1 	VAST 1.0
+2 	VAST 2.0
+3 	VAST 3.0
+4 	VAST 1.0 Wrapper
+5 	VAST 2.0 Wrapper
+6 	VAST 3.0 Wrapper
+7 	VAST 4.0
+8 	VAST 4.0 Wrapper
+9 	DAAST 1.0
+10 	DAAST 1.0 Wrapper
+Playback methods
+Value 	Description
+1 	Initiates on Page Load with Sound On
+2 	Initiates on Page Load with Sound Off by Default
+3 	Initiates on Clickwith Sound On
+4 	Initiates on Mouse-Over with Sound On
+5 	Initiates on Entering Viewportwith Sound On
+6 	Initiates on Entering Viewportwith Sound Off by Default
+Ad position
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	40/43
+
+-- 40 of 43 --
+
+Value 	Description
+1 	In-Stream
+Played before, during, or after the streaming video content that the consumer has requested; for example, Pre-roll, Mid-roll, Post-roll.
+2 	In-Banner
+Exists within a web banner that leverages the banner space to deliver a video experience as opposed to another static or rich media format.
+The format relies on the existence of display ad inventory on the page for its delivery.
+3 	In-Article
+Loads and plays dynamically between paragraphs of editorial content; exists as a standalone branded message.
+4 	In-Feed
+Found in content, social, or product feeds.
+5 	Interstitial/Slider/Floating
+Covers the entire or a portion of screen area, but is always on screen while displayed; that is, can't be scrolled out of view). Note that a full-
+screen interstitial (for example, inmobile), can be distinguished from a floating/slider unit by the imp.instlfield parameter.
+Value 	Description
+0 	Unknown
+1 	Above the Fold
+2 	DEPRECATED - May or may not be initially visible depending on screen size/resolution.
+3 	Below the Fold
+4 	Header
+5 	Footer
+6 	Sidebar
+7 	FullScreen
+Video placement types
+API frameworks
+Value 	Description
+1 	VPAID 1.0
+2 	VPAID 2.0
+3 	MRAID-1
+4 	ORMMA
+5 	MRAID-2
+6 	MRAID-3
+Video linearity
+Value 	Description
+1 	Linear/In-Stream
+2 	Non-Linear/Overlay
+Start delay
+Value 	Description
+>0 	Mid-Roll (value indicates start delay in seconds)
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	41/43
+
+-- 41 of 43 --
+
+Value 	Description
+0 	Pre-Roll
+-1 	Generic Mid-Roll
+-2 	Generic Post-Roll
+Content context
+Value 	Description
+1 	Video: a video file or stream such as Internet TV broadcasts.
+2 	Game: an interactive software game.
+3 	Music: an audio file or stream such as Internet radio broadcasts.
+4 	Application: an interactive software application.
+5 	Text: a primarily textual document such as a web page, eBook, or news article.
+6 	Other: none of the other categories applies.
+7 	Unknown.
+Content delivery methods
+Value 	Description
+1 	Streaming
+2 	Progressive
+3 	Download
+Playback cessation modes
+Value 	Description
+1 	On video completion or when terminated by user
+2 	On leaving viewPort or when terminated by user
+3 	On leaving viewPort continues as a floating/slider unit until video completion or when terminated by user
+Production quality
+Value 	Description
+0 	Unknown
+1 	Professionally Produced
+2 	Prosumer
+3 	User Generated (UGC)
+Inventory Quality Guidelines (IQG) ratings
+Value 	Description
+1 	All Audiences
+2 	Everyone Over 12
+3 	Mature Audiences
+Device type
+Value 	Description
+1 	Mobile/Table
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	42/43
+
+-- 42 of 43 --
+
+Updated 11 days ago
+ Multi-format support for AMP 	Deal Prioritization for Ad Pods for CTV 
+Did this page help you? 	Yes 	No
+Value 	Description
+2 	Personal Computer
+3 	Connected TV
+4 	Phone
+5 	Tablet
+6 	Connected Device
+7 	Set Top Box
+Connection type
+Value 	Description
+0 	Unknown
+1 	Ethernet
+2 	WIFI
+3 	Cellular Network –Unknown Generation
+4 	Cellular Network –2G
+5 	Cellular Network –3G
+6 	Cellular Network –4G
+Location type
+Value 	Description
+1 	GPS/Location Services
+2 	IP Address
+3 	User provided (e.g., registration data)
+IP location services
+Value 	Description
+1 	ip2location
+2 	Neustar (Quova)
+3 	MaxMind
+4 	NetAcuity(Digital Element)
+
+ 	
+11/30/25, 3:38 PM 	OpenWrap OTT video API specification
+https://help.pubmatic.com/openwrap/docs/openwrap-ottctv 	43/43
+
+-- 43 of 43 --
+

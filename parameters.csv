@@ -1,0 +1,96 @@
+Parameter,Type,Source,Description
+req.id,Required,Prebid,Must not be empty
+req.tmax,Required,Prebid,Must be non-negative (>= 0)
+req.imp,Required,Prebid,Must contain at least one element
+req.cur,Recommended,Prebid,Maximum 1 currency allowed
+req.site,Required (One of Site/App/DOOH),Prebid,Exactly one inventory type required
+req.app,Required (One of Site/App/DOOH),Prebid,Exactly one inventory type required
+req.dooh,Required (One of Site/App/DOOH),Prebid,Exactly one inventory type required
+req.site.id,Required (if Site),Prebid,At least one of ID or Page must be non-empty
+req.site.page,Required (if Site),Prebid,At least one of ID or Page must be non-empty
+req.app.id,Required (if App),Prebid,Must not be in blocked apps list
+req.device.w,Required,Prebid,Must be non-negative
+req.device.h,Required,Prebid,Must be non-negative
+req.device.ppi,Required,Prebid,Must be non-negative
+req.device.geo.accuracy,Required,Prebid,Must be non-negative
+imp.id,Required,Prebid,Must not be null or empty
+imp.tagid,Required,Prebid,Must not be null or empty
+imp.banner,Required (One of Banner/Video/Native),Prebid,At least one must be present
+imp.video,Required (One of Banner/Video/Native),Prebid,At least one must be present
+imp.native,Required (One of Banner/Video/Native),Prebid,At least one must be present
+video.placement,Required,OpenWrap,Placement type
+video.playbackend,Required,OpenWrap,Playback method
+video.w,Required,OpenWrap,Width
+video.h,Required,OpenWrap,Height
+video.mimes,Required,OpenWrap,MIME types
+video.protocols,Required,OpenWrap,Video protocols
+video.linearity,Required,OpenWrap,Linearity
+video.minduration,Required,OpenWrap,Minimum duration
+video.maxduration,Required,OpenWrap,Maximum duration
+app.id,Required,OpenWrap,App ID
+app.name,Required,OpenWrap,App Name
+app.bundle,Required,OpenWrap,App Bundle
+device.ua,Required,OpenWrap,User Agent
+device.ip,Required,OpenWrap,IP Address
+device.devicetype,Required,OpenWrap,Device Type
+imp.ext.instl,Required (if Interstitial),OpenWrap,Interstitial flag
+req.ext.wrapper.profileid,Required,OpenWrap,Profile ID
+video.ext.maxad,Recommended,OpenWrap,Max Ads
+video.ext.minad,Recommended,OpenWrap,Min Ads
+video.ext.maxduration,Recommended,OpenWrap,Max Duration
+video.ext.minduration,Recommended,OpenWrap,Min Duration
+video.ext.excl_cat,Recommended,OpenWrap,Excluded Categories
+video.ext.excl_adv_dom,Recommended,OpenWrap,Excluded Advertiser Domains
+video.ext.excl_b_attr,Recommended,OpenWrap,Excluded Attributes
+video.plcmt,Recommended,OpenWrap,Placement
+video.api,Recommended,OpenWrap,API Frameworks
+video.delivery,Recommended,OpenWrap,Delivery Method
+video.startdelay,Recommended,OpenWrap,Start Delay
+video.battr,Recommended,OpenWrap,Blocked Creative Attributes
+video.pos,Recommended,OpenWrap,Ad Position
+video.maxextended,Recommended,OpenWrap,Max Extended Duration
+video.minbitrate,Recommended,OpenWrap,Min Bitrate
+video.maxbitrate,Recommended,OpenWrap,Max Bitrate
+video.boxingallowed,Recommended,OpenWrap,Boxing Allowed
+video.playbackmethod,Recommended,OpenWrap,Playback Method
+video.skip,Recommended,OpenWrap,Skippable
+video.skipmin,Recommended,OpenWrap,Skip Minimum
+video.skipafter,Recommended,OpenWrap,Skip After
+video.sequence,Recommended,OpenWrap,Sequence
+app.domain,Recommended,OpenWrap,App Domain
+app.storeurl,Recommended,OpenWrap,Store URL
+app.cat,Recommended,OpenWrap,Categories
+app.sectioncat,Recommended,OpenWrap,Section Categories
+app.pagecat,Recommended,OpenWrap,Page Categories
+app.ver,Recommended,OpenWrap,App Version
+app.privacypolicy,Recommended,OpenWrap,Privacy Policy
+app.paid,Recommended,OpenWrap,Paid App
+device.make,Recommended,OpenWrap,Device Make
+device.model,Recommended,OpenWrap,Device Model
+device.os,Recommended,OpenWrap,OS
+device.osv,Recommended,OpenWrap,OS Version
+device.pxratio,Recommended,OpenWrap,Pixel Ratio
+device.js,Recommended,OpenWrap,JavaScript Support
+device.language,Recommended,OpenWrap,Language
+device.carrier,Recommended,OpenWrap,Carrier
+device.mccmnc,Recommended,OpenWrap,MCCMNC
+device.connectiontype,Recommended,OpenWrap,Connection Type
+device.ifa,Recommended,OpenWrap,IDFA/GAID
+device.didsha1,Recommended,OpenWrap,Device ID SHA1
+device.didmd5,Recommended,OpenWrap,Device ID MD5
+device.dpidsha1,Recommended,OpenWrap,Platform ID SHA1
+device.dpidmd5,Recommended,OpenWrap,Platform ID MD5
+device.macsha1,Recommended,OpenWrap,MAC SHA1
+device.macmd5,Recommended,OpenWrap,MAC MD5
+device.geofetch,Recommended,OpenWrap,Geo Fetch
+user.id,Recommended,OpenWrap,User ID
+user.buyeruid,Recommended,OpenWrap,Buyer UID
+user.yob,Recommended,OpenWrap,Year of Birth
+user.gender,Recommended,OpenWrap,Gender
+user.keywords,Recommended,OpenWrap,Keywords
+user.customdata,Recommended,OpenWrap,Custom Data
+user.geo,Recommended,OpenWrap,User Geo
+user.ext,Recommended,OpenWrap,User Extensions
+regs.coppa,Recommended,OpenWrap,COPPA
+regs.ext.gdpr,Recommended,OpenWrap,GDPR
+regs.ext.us_privacy,Recommended,OpenWrap,US Privacy

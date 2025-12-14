@@ -1,0 +1,602 @@
+
+--- Page 1 ---
+Validation for Request Parameters by Prebid
+Server 
+Created by   Jaydeep Mohite , last updated on   Nov 25, 2025   •   6 minute read 
+…   /   CTV Support in OW 
+Below are parameters   validated by Prebid Server in ORTB request. 
+Request Validation Parameters and Conditions 
+Parameter   Validation Condition   Error Type   Error Message/Actio 
+req.ID   Must not be empty   Fatal Error   "request missing re 
+req.TMax   Must be non-
+negative (>= 0) 
+Fatal Error   "request.tmax must
+{value}" 
+req.Imp   Must contain at
+least one element 
+Fatal Error   "request.imp must c
+element." 
+req.Cur   Maximum 1
+currency allowed 
+Warning   Takes first currency
+can only process o
+currency in the list,
+currency" 
+req.Source.TID   Must exist if
+AutoGenSourceTID
+enabled 
+Conditional   Validates and fills w
+AutoGenSourceTID 
+req.Ext   Must be valid
+JSON 
+Fatal Error   "request.ext is inva 
+reqPrebid.Aliases   Must be valid
+aliases 
+Fatal Error   Refer   Alias Validati
+Conditions 
+reqPrebid.AliasGVLIDs   Must be valid
+GVLID mappings 
+Fatal Error   Refer   Alias GVLID
+Conditions 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   1/10 
+--- Page 2 ---
+reqPrebid.BidAdjustmentFactors   Must be valid
+adjustment factors 
+Fatal Error   Refer   Bid Adjustme
+Parameters and Co 
+reqPrebid.SChains   Must be valid
+supply chains 
+Fatal Error   Validated via   Bidde
+Chain Validation Pa 
+reqPrebid.Data 
+(EID Permissions) 
+Must have valid
+EID permissions 
+Fatal Error   Validated via   EID
+Validation Par
+Conditions 
+reqPrebid.CurrencyConversions   Must have valid
+custom rates 
+Fatal Error   Validated via 
+currency.Valid 
+req.Channel   Must be valid
+channel 
+Fatal Error   Validate channel   Va 
+Inventory Type   Exactly one
+inventory type
+required 
+Fatal Error   Validated via   Inven
+Parameters and Co 
+req.Ext 
+(Extended) 
+Must pass
+extended validation 
+Mixed   Validated via 
+validateReques 
+- can return fatal o 
+req.Site   Must be valid site
+object 
+Error   Validated via   Site
+Parameters a 
+req.App   Must be valid app
+object 
+Error   Validated via   App
+Parameters a 
+req.DOOH   Must be valid
+DOOH object 
+Error   Validated via   DO
+Parameters a 
+req.Regs.GPP   Must be valid GPP
+consent string 
+Warning   "GPP consent strin
+ignored. ({error})" 
+req.User   Must be valid user
+object 
+Mixed   Refer   User Validati
+Conditions 
+req.Regs   Must be valid
+regulations object 
+Mixed   Validated via   Reg
+Validation Par
+Condition 
+req.Device   Must be valid
+device object 
+Error   Validated via   Dev
+Parameters a 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   2/10 
+--- Page 3 ---
+Cookie Deprecation   Must be valid if
+present 
+Error   Based on header   " 
+cookies are deprec 
+CCPA Consent   Must be valid
+CCPA consent
+string 
+Warning   "CCPA consent is i
+({error})" - USPriva 
+imp.ID   Must be unique
+across all
+impressions 
+Fatal Error   "request.imp[{i}].id
+both "{id}". Imp IDs 
+Each 
+imp 
+Must pass
+impression
+validation 
+Mixed   Validated via   Impre
+Parameters and Co 
+- can return fatal o 
+Alias Validation Parameters and Conditions 
+Parameter   Validation
+Condition   Error Type   Error Message/Action 
+aliasBidderInfo.AliasOf   Must not be
+empty (length
+> 0) 
+Conditional   Proceeds to further
+validation if alias is defined 
+Parent Bidder Existence   Parent bidder
+must exist in 
+infos 
+map 
+Fatal Error   "bidder:
+{parentBidderName} not
+found for an alias:
+{bidderName}" 
+Parent Bidder Type   Parent bidder
+must NOT be
+an alias itself 
+Fatal Error   "bidder:
+{parentBidderName}
+cannot be an alias of an
+alias: {bidderName}" 
+Alias GVLID Validation Parameters and Conditions 
+Parameter   Validation
+Condition 
+Error
+Type   Error Message/Action 
+alias 
+(key in
+aliasesGVLIDs
+map) 
+Must exist in
+the 
+aliases 
+map 
+Fatal
+Error 
+"request.ext.prebid.aliasgvlids. vendorId
+{vendorId} refers to unknown bidder alias:
+{alias}" 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   3/10 
+--- Page 4 ---
+vendorId 
+(value in
+aliasesGVLIDs
+map) 
+Must be
+greater than or
+equal to 1 (>=
+1) 
+Fatal
+Error 
+"request.ext.prebid.aliasgvlids. Invalid
+vendorId {vendorId} for alias: {alias}. Choose
+a different vendorId, or remove this entry." 
+Bid Adjustment Factors Validation Parameters and Conditions 
+Parameter 
+Validation
+Condition 
+Error
+Type   Error Message/Action 
+adjustmentFactor 
+(value in
+adjustmentFactors
+map) 
+Must be a
+positive
+number (>
+0) 
+Fatal
+Error 
+"request.ext.prebid.bidadjustmentfactors.
+{bidderToAdjust} must be a positive number.
+Got {adjustmentFactor}" 
+bidderName 
+(normalized) 
+Must be
+unique
+(case-
+insensitive) 
+Fatal
+Error 
+"cannot have multiple bidders that differ
+only in case style" 
+bidderToAdjust 
+(key in
+adjustmentFactors
+map) 
+Must be a
+known
+bidder or
+alias 
+Fatal
+Error 
+"request.ext.prebid.bidadjustmentfactors.
+{bidderToAdjust} is not a known bidder or
+alias 
+BidderToPrebidSChains - Supply Chain Validation Parameters
+and Conditions 
+Parameter   Validation
+Condition 
+Error
+Type   Error Message/Action 
+bidder 
+(in
+schainWrapper.Bidders) 
+Must be unique
+across all schain
+configurations 
+Fatal
+Error 
+"request.ext.prebid.schains
+contains multiple schains for bidder
+{bidder}; it must contain no more
+than one per bidder." 
+sChains 
+array 
+Each bidder can
+only appear once
+across all schain
+wrappers 
+Fatal
+Error 
+Returns error and nil map if
+duplicate bidder found 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   4/10 
+--- Page 5 ---
+EID Permissions Validation Parameters and Conditions 
+Parameter   Validation
+Condition 
+Error
+Type   Error Message/Action 
+eid.Source   Must not be
+empty (length
+> 0) 
+Fatal
+Error 
+request.ext.prebid.data.eidpermissions[{i 
+eid.Source   Must be
+unique across
+all
+eidpermissions
+entries 
+Fatal
+Error 
+request.ext.prebid.data.eidpermissions[{i 
+eid.Bidders   Must not be
+empty (length
+> 0) 
+Fatal
+Error 
+request.ext.prebid.data.eidpermissions[{i 
+eid.Bidders   All bidders
+must be valid
+(known
+bidders or
+aliases) 
+Fatal
+Error 
+request.ext.prebid.data.eidpermissions[{i 
+Validate Channel 
+Parameter   Validation Condition   Error
+Type   Error Message/Action 
+ext.prebid.channel.name   If provided, Must not
+be empty (length > 0) 
+Error   ext.prebid.channel.name   can't
+be empty 
+Inventory Type Validation Parameters and Conditions 
+Parameter 
+Validation
+Condition 
+Error
+Type   Error Message/Action 
+request.site
+or
+request.app
+or
+request.dooh 
+Exactly one
+inventory type
+must be
+defined 
+Fatal
+Error 
+"One of request.site or
+request.app or request.dooh
+must be defined" (if count = 0) 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   5/10 
+--- Page 6 ---
+Site Object Validation Parameters and Conditions 
+Parameter 
+Validation
+Condition 
+Error
+Type   Error Message/Action 
+req.Site   If null, no
+validation
+required 
+None   Returns 
+nil 
+(validation skipped) 
+req.Site.ID 
+and 
+req.Site.Page 
+At least one
+must be non-
+empty 
+Fatal
+Error 
+"request.site should include at least
+one of   request.site.id   or
+request.site.page." 
+req.Site.Ext   Must be valid
+and parseable 
+Fatal
+Error 
+Returns parsing error from 
+GetSiteExt() 
+req.Site.Ext.Amp   If defined, must
+be 0 or 1 
+Fatal
+Error 
+"request.site.ext.amp must be either 1,
+0, or undefined" 
+App Validation Parameters and Conditions 
+Parameter   Validation
+Condition   Error Type   Error Message/Action 
+req.App   If null, no
+validation required 
+None   Returns 
+nil 
+(validation skipped) 
+req.App.ID   Must not be in
+blocked apps list 
+BlockedApp
+Error 
+"Prebid-server does not process
+requests from App ID: {appID}" 
+req.App.Ext   Must be valid and
+parseable 
+Fatal Error   Returns parsing error from 
+GetAppExt() 
+DOOH Validation Parameters and Conditions 
+Parameter   Validation
+Condition 
+Error
+Type   Error Message/Action 
+req.DOOH   If null, no
+validation
+required 
+None   Returns 
+nil 
+(validation skipped) 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   6/10 
+--- Page 7 ---
+req.DOOH.ID 
+and 
+req.DOOH.VenueType 
+At least one
+must be
+present 
+Fatal
+Error 
+"request.dooh should include at least
+one of   request.dooh.id   or
+request.dooh.venuetype." 
+User Validation Parameters and Conditions 
+Parameter   Validation
+Condition   Error Type   Error Message/Action 
+req.User   If null, no
+validation
+required 
+None   Returns 
+nil 
+(validation skipped) 
+req.User.Geo.Accuracy   Must be
+non-
+negative
+(>= 0) 
+Fatal Error   "request.user.geo.accuracy 
+req.User.Consent   If
+conflicts
+with GPP
+GDPR
+string,
+warn 
+Warning   "user.consent GDPR string 
+req.User.Ext   Must be
+valid and
+parseable 
+Fatal Error   "request.user.ext object is n 
+req.User.Ext.Prebid.BuyerUIDs   If prebid
+exists,
+must
+have at
+least one
+buyer
+UID 
+Fatal Error   request.user.ext.pre 
+req.User.Ext.Prebid.BuyerUIDs 
+(keys) 
+Each
+bidder
+name
+must be
+valid or
+aliased 
+Fatal Error   "request.user.ext.{bidderNa 
+req.User.EIDs   Must be
+valid EID
+format 
+Warning/Error   Refer 
+EID (Extended Iden 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   7/10 
+--- Page 8 ---
+EID (Extended Identifier) Validation Parameters and Conditions 
+Parameter 
+Validation
+Condition   Error Type   Error Message/Action 
+eid.Source   Must not be
+empty 
+Warning   "request.user.eids[{index}] removed
+due to missing source" - EID is filtered
+out 
+eid.UIDs   Must contain at
+least one valid
+UID after
+validation 
+Warning   "request.user.eids[{index}] (source:
+{source}) removed due to empty uids" -
+EID is filtered out 
+eid.UIDs 
+(individual) 
+Each UID must
+pass UID
+validation 
+Warning/Error   Validated via   UID (User
+Identifier) Validation
+Parameters and Conditions 
+- invalid UIDs filtered out 
+UID (User Identifier) Validation Parameters and Conditions 
+Parameter   Validation
+Condition 
+Error
+Type   Error Message/Action 
+uid.ID   Must not
+be empty 
+Warning   "request.user.eids[{eidIndex}].uids[{uidIndex}]
+removed due to empty ids" - UID is filtered out 
+Regs (Regulations) Validation Parameters and Conditions 
+Parameter   Validation Condition   Error
+Type   Error Message/Action 
+req.Regs   If null, no validation
+required 
+None   Returns 
+nil 
+(validation skipped) 
+req.Regs.GDPR 
+and 
+req.Regs.GPPSID 
+If both present,
+GDPR signal must
+match GPP signal 
+Warning   "regs.gdpr signal conflicts with
+GPP (regs.gpp_sid) and will be
+ignored" 
+req.Regs.GDPR   If present, must be 0
+or 1 
+Fatal
+Error 
+"request.regs.gdpr must be
+either 0 or 1" 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   8/10 
+--- Page 9 ---
+Device Validation Parameters and Conditions 
+Parameter   Validation
+Condition 
+Error
+Type   Error Message/Action 
+device   If null, no
+validation
+required 
+None   Returns 
+nil 
+(validation skipped) 
+device.W   Must be non-
+negative (>=
+0) 
+Fatal
+Error 
+"request.device.w must be a positive
+number" 
+device.H   Must be non-
+negative (>=
+0) 
+Fatal
+Error 
+"request.device.h must be a positive
+number" 
+device.PPI   Must be non-
+negative (>=
+0) 
+Fatal
+Error 
+"request.device.ppi must be a
+positive number" 
+device.Geo.Accuracy   Must be non-
+negative (>=
+0) 
+Fatal
+Error 
+"request.device.geo.accuracy must
+be a positive number" 
+Impression (Imp) Validation Parameters and Conditions 
+Parameter   Validation Condition   Error
+Type   Error Message/Action 
+imp.Id   Must not be null or
+empty 
+Fatal
+Error 
+"Invalid request! Mandatory field imp.Id
+missing" 
+imp.TagId   Must not be null or
+empty 
+Fatal
+Error 
+"Invalid imp:{impId} ! Mandatory field
+imp.tagid missing" 
+imp.Banner 
+, 
+imp.Video 
+, 
+At least one must be
+present 
+Fatal
+Error 
+"Invalid imp:{impId} ! Mandatory object
+Banner/Video/Native missing" 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   9/10 
+--- Page 10 ---
+imp.Native 
+imp.Banner   If present, must pass
+banner validation 
+Fatal
+Error 
+"Invalid imp:{impId} ! Error: {error}" 
+imp.Native   If present, must pass
+native validation 
+Fatal
+Error 
+"Invalid imp:{impId} ! Error: {error}" 
+ 
+11/28/25, 8:50 PM   Validation for Request Parameters by Prebid Server 
+https://wiki.pubmatic.com/con fl uence/spaces/Products/pages/273843498/Validation+for+Request+Parameters+by+Prebid+Server   10/10 
