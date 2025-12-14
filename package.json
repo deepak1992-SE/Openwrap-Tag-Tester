@@ -2,7 +2,7 @@
   "name": "ow-tag-tester",
   "version": "1.0.0",
   "description": "A web application to validate ad tags against defined rules.",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "server": "cd server && node index.js",
