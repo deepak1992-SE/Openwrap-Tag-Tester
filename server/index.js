@@ -11,9 +11,20 @@ app.use(bodyParser.json());
 const validationEngine = require('./validationEngine');
 const rules = require('./rules');
 const path = require('path');
+const fs = require('fs');
+
+const CLIENT_BUILD_PATH = path.join(__dirname, '../client/dist');
+console.log('Server started');
+console.log('__dirname:', __dirname);
+console.log('CLIENT_BUILD_PATH:', CLIENT_BUILD_PATH);
+try {
+    console.log('Listing CLIENT_BUILD_PATH contents:', fs.readdirSync(CLIENT_BUILD_PATH));
+} catch (e) {
+    console.error('Failed to list CLIENT_BUILD_PATH:', e.message);
+}
 
 // Serve static files from the client app
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(CLIENT_BUILD_PATH));
 
 app.post('/api/validate', (req, res) => {
     const { tag, mode } = req.body;
